@@ -1,29 +1,19 @@
-package model;
+package hackathon;
 
-/**
- * The type Utente.
- */
 public class Utente {
-    private final String login;
-    private String password;
+    protected String id;
+    protected String nome;
+    protected String email;
 
-    /**
-     * Instantiates a new Utente.
-     *
-     * @param login    the login
-     * @param password the password
-     */
-    public Utente(String login, String password) {
-        this.login = login;
-        this.password = password;
+    public Utente(String id, String nome, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+    }
+    public void registrati() {
+        System.out.println(nome + " si è registrato.");
     }
 
-    /**
-     * Gets login.
-     *
-     * @return the login
-     */
-    public String getLogin() {
-        return login;
-    }
+
+
 }
