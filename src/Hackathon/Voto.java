@@ -1,4 +1,4 @@
-package hackathon;
+package Hackathon;
 
 public class Voto {
     private Giudice giudice;

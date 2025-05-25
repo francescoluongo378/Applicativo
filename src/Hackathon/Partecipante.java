@@ -1,9 +1,9 @@
-package hackathon;
+package Hackathon;
 
 public class Partecipante extends Utente {
     private Team team;
 
-    public Partecipante(String id,String nome, String email) {
+    public Partecipante(String id, String nome, String email) {
         super(id,nome, email);
     }
 

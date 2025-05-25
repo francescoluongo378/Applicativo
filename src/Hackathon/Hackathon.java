@@ -1,4 +1,4 @@
-package hackathon;
+package Hackathon;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class Hackathon {
     private int maxTeam;
     private Classifica classifica;
     private List<Giudice> giudici;
-    private List<Team> teams;
+    private List<Team> Teams;
 
     public Hackathon(String titolo, String sede, int maxPartecipanti,
                      LocalDateTime dataInizio, LocalDateTime dataFine,
@@ -32,9 +32,11 @@ public class Hackathon {
         this.fineIscrizioni = fineIscrizioni;
         this.maxTeam = maxTeam;
         this.giudici = new ArrayList<>();
-        this.teams = new ArrayList<>();
+        this.Teams = new ArrayList<>();
         this.classifica = new Classifica();
     }
+
+
 
     public String getTitolo() { return titolo; }
     public String getSede() { return sede; }
@@ -45,7 +47,7 @@ public class Hackathon {
     public LocalDateTime getFineIscrizioni() { return fineIscrizioni; }
     public int getMaxTeam() { return maxTeam; }
     public List<Giudice> getGiudici() { return new ArrayList<>(giudici); }
-    public List<Team> getTeams() { return new ArrayList<>(teams); }
+    public List<Team> getTeams() { return new ArrayList<>(Teams); }
     public Classifica getClassifica() { return classifica; }
 }
 

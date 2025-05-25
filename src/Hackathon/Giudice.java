@@ -1,4 +1,4 @@
-package hackathon;
+package Hackathon;
 public class Giudice extends Utente {
     private static final int PUNTEGGIO_MINIMO = 0;
     private static final int PUNTEGGIO_MASSIMO = 10;
@@ -6,7 +6,9 @@ public class Giudice extends Utente {
     public Giudice(String id, String nome, String email) {
         super(id, nome, email);
     }
-
+    public String getNome() {
+        return nome;
+    }
     public boolean valutaTeam(Team team, int punteggio) {
         if (punteggio < PUNTEGGIO_MINIMO || punteggio > PUNTEGGIO_MASSIMO) {
             return false;

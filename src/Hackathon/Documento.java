@@ -1,4 +1,4 @@
-package hackathon;
+package Hackathon;
 
 public class Documento {
     private int progresso;

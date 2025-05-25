@@ -1,4 +1,4 @@
-package hackathon;
+package Hackathon;
 
 public class Organizzatore extends Utente {
     private Hackathon hackathon;
