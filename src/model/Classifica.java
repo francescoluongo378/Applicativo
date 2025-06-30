@@ -1,21 +1,21 @@
-package Hackathon;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Classifica {
-    private List<Team> Teams;
+    private final List<Team> teams;
 
     public Classifica() {
-        this.Teams = new ArrayList<>();
+        teams = new ArrayList<>();
     }
 
     public void aggiungiTeam(Team team) {
-        Teams.add(team);
+        teams.add(team);
     }
 
     public List<Team> getTeams() {
-        return Teams;
+        return teams;
     }
-}
 
+}

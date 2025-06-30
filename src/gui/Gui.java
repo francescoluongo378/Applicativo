@@ -1,140 +1,202 @@
 package gui;
 
+import controller.Controller;
+import model.*;
+
 import javax.swing.*;
 import java.awt.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import Hackathon.*;
-import controller.*;
+import java.util.Optional;
 
 public class Gui extends JFrame {
-    private Hackathon hackathon;
-    private Controller controller;
 
-    public Gui(Hackathon hackathon) {
-        this.hackathon = hackathon;
-        this.controller = new Controller(hackathon);
-        setTitle("Dettagli Hackathon");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
+    private Controller controller;
+    private Utente utenteLoggato;
+
+    // Componenti base
+    private JPanel panelLogin;
+    private JTextField txtNome, txtEmail;
+    private JPasswordField txtPassword;
+    private JComboBox<String> comboRuolo;
+    private JButton btnLogin;
+
+    private JPanel panelOperativo;
+    private JButton btnCreaTeam, btnListaGiudici, btnListaPartecipanti, btnValutaTeam, btnLogout;
+    private int idGiudice;
+
+    public Gui() {
+        // usa il costruttore no-arg del Controller
+        controller = new Controller();
+
+        setTitle("Hackathon Manager");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(450, 350);
         setLocationRelativeTo(null);
-        initComponents();
+        setLayout(new BorderLayout());
+
+        creaPanelLogin();
+        creaPanelOperativo();
+
+        add(panelLogin, BorderLayout.CENTER);
+        panelOperativo.setVisible(false);
+
+        setVisible(true);
     }
 
-    private void initComponents() {
-        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private void creaPanelLogin() {
+        panelLogin = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        panel.add(new JLabel("Titolo:"));
-        panel.add(new JLabel(hackathon.getTitolo()));
+        JLabel lblTitolo = new JLabel("Login / Registrazione", SwingConstants.CENTER);
+        lblTitolo.setFont(new Font("Arial", Font.BOLD, 18));
+        gbc.gridx=0; gbc.gridy=0; gbc.gridwidth=2;
+        panelLogin.add(lblTitolo, gbc);
 
-        panel.add(new JLabel("Sede:"));
-        panel.add(new JLabel(hackathon.getSede()));
+        gbc.gridwidth=1;
+        gbc.gridy++;
 
-        panel.add(new JLabel("Data inizio:"));
-        panel.add(new JLabel(hackathon.getDataInizio().format(formatter)));
+        // Nome
+        panelLogin.add(new JLabel("Nome:"), gbc);
+        gbc.gridx=1;
+        txtNome = new JTextField();
+        panelLogin.add(txtNome, gbc);
 
-        panel.add(new JLabel("Data fine:"));
-        panel.add(new JLabel(hackathon.getDataFine().format(formatter)));
+        // Email
+        gbc.gridy++; gbc.gridx=0;
+        panelLogin.add(new JLabel("Email:"), gbc);
+        gbc.gridx=1;
+        txtEmail = new JTextField();
+        panelLogin.add(txtEmail, gbc);
 
-        panel.add(new JLabel("Iscrizioni dal:"));
-        panel.add(new JLabel(hackathon.getInizioIscrizioni().format(formatter)));
+        // Password
+        gbc.gridy++; gbc.gridx=0;
+        panelLogin.add(new JLabel("Password:"), gbc);
+        gbc.gridx=1;
+        txtPassword = new JPasswordField();
+        panelLogin.add(txtPassword, gbc);
 
-        panel.add(new JLabel("Iscrizioni fino al:"));
-        panel.add(new JLabel(hackathon.getFineIscrizioni().format(formatter)));
+        // Ruolo
+        gbc.gridy++; gbc.gridx=0;
+        panelLogin.add(new JLabel("Ruolo:"), gbc);
+        gbc.gridx=1;
+        comboRuolo = new JComboBox<>(new String[]{"organizzatore","giudice","partecipante"});
+        panelLogin.add(comboRuolo, gbc);
 
-        panel.add(new JLabel("Max partecipanti:"));
-        panel.add(new JLabel(String.valueOf(hackathon.getMaxPartecipanti())));
+        // Bottone
+        gbc.gridy++; gbc.gridx=0; gbc.gridwidth=2;
+        btnLogin = new JButton("Login / Registrati");
+        panelLogin.add(btnLogin, gbc);
 
-        panel.add(new JLabel("Max team:"));
-        panel.add(new JLabel(String.valueOf(hackathon.getMaxTeam())));
+        btnLogin.addActionListener(e -> {
+            String nome = txtNome.getText().trim();
+            String email = txtEmail.getText().trim();
+            String pwd   = new String(txtPassword.getPassword());
+            String ruolo = (String) comboRuolo.getSelectedItem();
 
-        // Bottone per mostrare i team
-        JButton btnVisualizzaTeam = new JButton("Visualizza Team");
-        btnVisualizzaTeam.addActionListener(e -> {
-            StringBuilder sb = new StringBuilder();
-            for (Team t : hackathon.getTeams()) {
-                sb.append(t.getNome()).append(" - Progresso: ")
-                        .append(t.getProgresso()).append("% - Punteggio: ")
-                        .append(t.getPunteggio()).append("\n");
+            if (nome.isEmpty() || email.isEmpty() || pwd.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Compila tutti i campi!", "Errore", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            if (sb.length() == 0) sb.append("Nessun team registrato.");
-            JOptionPane.showMessageDialog(this, sb.toString(), "Team", JOptionPane.INFORMATION_MESSAGE);
-        });
 
-        JButton btnCreaTeam = new JButton("Crea Team");
+            // Provo login
+            Optional<Utente> opt = controller.login(email, pwd);
+            if (opt.isPresent()) {
+                utenteLoggato = opt.get();
+                if (!utenteLoggato.getRuolo().equalsIgnoreCase(ruolo)) {
+                    JOptionPane.showMessageDialog(this,
+                            "Ruolo errato rispetto alla registrazione precedente!",
+                            "Errore", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } else {
+                // Se login fallisce, registro
+                opt = controller.registraUtente(nome, email, pwd, ruolo);
+                if (opt.isPresent()) {
+                    utenteLoggato = opt.get();
+                    JOptionPane.showMessageDialog(this, "Registrazione avvenuta con successo!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Errore nella registrazione!", "Errore", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            // Passo alla finestra del ruolo
+            this.setVisible(false);
+            apriFinestraRuolo();
+        });
+    }
+
+    private void creaPanelOperativo() {
+        panelOperativo = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10,10,10,10);
+
+        btnCreaTeam        = new JButton("Crea Team");
+        btnListaGiudici    = new JButton("Lista Giudici");
+        btnListaPartecipanti = new JButton("Lista Partecipanti");
+        btnValutaTeam      = new JButton("Valuta Team");
+        btnLogout          = new JButton("Logout");
+
+        gbc.gridx=0; gbc.gridy=0; panelOperativo.add(btnCreaTeam, gbc);
+        gbc.gridx=1; panelOperativo.add(btnListaGiudici, gbc);
+        gbc.gridx=0; gbc.gridy=1; panelOperativo.add(btnListaPartecipanti, gbc);
+        gbc.gridx=1; panelOperativo.add(btnValutaTeam, gbc);
+        gbc.gridx=0; gbc.gridy=2; gbc.gridwidth=2; panelOperativo.add(btnLogout, gbc);
+
+        // listener
         btnCreaTeam.addActionListener(e -> {
-            String nome = JOptionPane.showInputDialog(this, "Nome del team:");
-            if (controller.creaTeam(nome)) {
-                JOptionPane.showMessageDialog(this, "Team creato!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Errore nella creazione del team.");
-            }
-        });
-
-        JButton btnAggiungiGiudice = new JButton("Aggiungi Giudice");
-        btnAggiungiGiudice.addActionListener(e -> {
-            String nome = JOptionPane.showInputDialog(this, "Nome giudice:");
-            String email = JOptionPane.showInputDialog(this, "Email giudice:");
-            if (controller.aggiungiGiudice(nome, email)) {
-                JOptionPane.showMessageDialog(this, "Giudice aggiunto!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Errore nell'aggiunta del giudice.");
-            }
-        });
-
-        JButton btnValutaTeam = new JButton("Valuta Team");
-        btnValutaTeam.addActionListener(e -> {
-            String nomeGiudice = JOptionPane.showInputDialog(this, "Nome giudice:");
             String nomeTeam = JOptionPane.showInputDialog(this, "Nome team:");
-            String votoStr = JOptionPane.showInputDialog(this, "Voto (0-10):");
+            if (nomeTeam!=null && !nomeTeam.isBlank()) {
+                boolean ok = controller.creaTeam(nomeTeam.trim());
+                JOptionPane.showMessageDialog(this, ok ? "Team creato" : "Errore");
+            }
+        });
+        btnListaGiudici.addActionListener(e -> {
+            controller.caricaGiudiciDaDB();
+            List<Giudice> list = controller.getHackathon().getGiudici();
+            String s = list.isEmpty() ? "Nessun giudice" :
+                    String.join("\n", list.stream().map(Giudice::getNome).toArray(String[]::new));
+            JOptionPane.showMessageDialog(this, s);
+        });
+        btnListaPartecipanti.addActionListener(e -> {
+            controller.caricaTeamsDaDB();
+            List<Partecipante> pp = controller.getHackathon().getPartecipanti();
+            String s = pp.isEmpty() ? "Nessun partecipante" :
+                    String.join("\n", pp.stream().map(Partecipante::getNome).toArray(String[]::new));
+            JOptionPane.showMessageDialog(this, s);
+        });
+        btnValutaTeam.addActionListener(e -> {
+            String team = JOptionPane.showInputDialog(this,"Nome team:");
+            String v    = JOptionPane.showInputDialog(this,"Voto 1-10:");
             try {
-                int voto = Integer.parseInt(votoStr);
-                if (controller.valutaTeam(nomeGiudice, nomeTeam, voto)) {
-                    JOptionPane.showMessageDialog(this, "Team valutato!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Errore: documento non completo o voto non valido.");
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Voto non valido.");
+                int voto = Integer.parseInt(v);
+
+                boolean ok = controller.assegnaVoto(idGiudice, Integer.parseInt(team),voto);
+                JOptionPane.showMessageDialog(this, ok?"Votato":"Errore voto");
+            } catch(Exception ex) {
+                JOptionPane.showMessageDialog(this,"Voto non valido");
             }
         });
-
-        JButton btnAggiornaProgresso = new JButton("Aggiorna Progresso");
-        btnAggiornaProgresso.addActionListener(e -> {
-            String nome = JOptionPane.showInputDialog(this, "Nome team:");
-            String pStr = JOptionPane.showInputDialog(this, "Progresso (0-100):");
-            try {
-                int p = Integer.parseInt(pStr);
-                if (controller.aggiornaProgressoTeam(nome, p)) {
-                    JOptionPane.showMessageDialog(this, "Progresso aggiornato!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Team non trovato.");
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Valore non valido.");
-            }
+        btnLogout.addActionListener(e -> {
+            utenteLoggato = null;
+            panelOperativo.setVisible(false);
+            panelLogin.setVisible(true);
         });
+    }
 
-        JButton btnClassifica = new JButton("Classifica");
-        btnClassifica.addActionListener(e -> {
-            List<Team> classifica = hackathon.getClassifica().getTeams();
-            classifica.sort((a, b) -> b.getPunteggio() - a.getPunteggio());
-            StringBuilder sb = new StringBuilder("=== Classifica ===\n");
-            for (Team t : classifica) {
-                sb.append(t.getNome()).append(" - ").append(t.getPunteggio()).append("\n");
-            }
-            JOptionPane.showMessageDialog(this, sb.toString(), "Classifica", JOptionPane.INFORMATION_MESSAGE);
-        });
+    private void apriFinestraRuolo() {
+        switch (utenteLoggato.getRuolo().toLowerCase()) {
+            case "organizzatore" -> new FinestraOrganizzatore(controller, utenteLoggato, this).setVisible(true);
+            case "giudice" -> new FinestraGiudice(controller, utenteLoggato, this).setVisible(true);
+            case "partecipante" -> new FinestraPartecipante(controller, utenteLoggato, this).setVisible(true);
+            default -> JOptionPane.showMessageDialog(this, "Ruolo non riconosciuto!");
+        }
+        this.setVisible(false); // Nasconde la finestra di login
+    }
 
-        panel.add(btnVisualizzaTeam);
-        panel.add(btnCreaTeam);
-        panel.add(btnAggiungiGiudice);
-        panel.add(btnAggiornaProgresso);
-        panel.add(btnValutaTeam);
-        panel.add(btnClassifica);
-
-        getContentPane().add(panel);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Gui::new);
     }
 }
