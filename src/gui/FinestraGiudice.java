@@ -2,63 +2,137 @@ package gui;
 
 import controller.Controller;
 import model.Classifica;
+import model.Team;
 import model.Utente;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import javax.swing.SpinnerNumberModel;
 
 public class FinestraGiudice extends JFrame {
-    private Controller controller;
-    private Utente giudice;
-    private JFrame finestraLogin;
 
     public FinestraGiudice(Controller controller, Utente giudice, JFrame finestraLogin) {
-        this.controller = controller;
-        this.giudice = giudice;
-        this.finestraLogin = finestraLogin;
 
-        setTitle("Finestra Giudice - Benvenuto " + giudice.getNome());
-        setSize(400, 300);
+        setTitle("Giudice: " + giudice.getNome());
+        setSize(500, 350);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        inizializzaGUI();
-    }
+        JPanel p = new JPanel(new GridLayout(4, 1, 10, 10));
+        JButton b1 = new JButton("Visualizza Team");
+        JButton b2 = new JButton("Assegna Voto a un Team");
+        JButton b3 = new JButton("Visualizza Classifica");
+        JButton b4 = new JButton("Logout");
 
-    private void inizializzaGUI() {
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
+        p.add(b1);
+        p.add(b2);
+        p.add(b3);
+        p.add(b4);
+        add(p);
 
-        JButton btnValutaTeam = new JButton("Valuta un Team");
-        JButton btnVisualizzaClassifica = new JButton("Visualizza Classifica");
-        JButton btnLogout = new JButton("Logout");
+        b1.addActionListener(_ -> {
+            controller.caricaTeamsDaDB();
+            List<Team> teams = controller.getHackathon().getTeams();
+            if (teams.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nessun team presente.");
+                return;
+            }
+            StringBuilder sb = new StringBuilder("Team:\n");
+            for (Team t : teams) {
+                sb.append("- ").append(t.getNome())
+                        .append(" (Progresso: ").append(t.getProgresso()).append("%)\n");
+            }
+            JOptionPane.showMessageDialog(this, sb.toString());
+        });
 
-        btnValutaTeam.addActionListener(e -> {
-            String team = JOptionPane.showInputDialog(this, "Inserisci nome del team:");
-            String votoStr = JOptionPane.showInputDialog(this, "Inserisci voto da 1 a 10:");
-            try {
-                int voto = Integer.parseInt(votoStr);
-                controller.valutaTeam(giudice, team, voto);
-                JOptionPane.showMessageDialog(this, "Team valutato con successo!");
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Voto non valido.");
+        b2.addActionListener(_ -> {
+            // Prima mostriamo la lista dei team disponibili
+            controller.caricaTeamsDaDB();
+            List<Team> teams = controller.getHackathon().getTeams();
+            if (teams.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nessun team presente da valutare.");
+                return;
+            }
+            
+            // Creiamo un array di stringhe per il JComboBox
+            String[] teamOptions = new String[teams.size()];
+            for (int i = 0; i < teams.size(); i++) {
+                Team t = teams.get(i);
+                teamOptions[i] = t.getNome() + " (ID: " + t.getId() + ")";
+            }
+            
+            // Mostriamo un JComboBox per selezionare il team
+            JComboBox<String> teamCombo = new JComboBox<>(teamOptions);
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Seleziona il team da valutare:"));
+            panel.add(teamCombo);
+            
+            // Aggiungiamo uno spinner per il voto
+            SpinnerNumberModel votoModel = new SpinnerNumberModel(7, 1, 10, 1);
+            JSpinner votoSpinner = new JSpinner(votoModel);
+            panel.add(new JLabel("Voto (1-10):"));
+            panel.add(votoSpinner);
+            
+            int result = JOptionPane.showConfirmDialog(this, panel, "Valuta Team", 
+                                                      JOptionPane.OK_CANCEL_OPTION, 
+                                                      JOptionPane.PLAIN_MESSAGE);
+            
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    // Estraiamo l'ID del team dalla stringa selezionata
+                    String selectedTeam = (String) teamCombo.getSelectedItem();
+                    assert selectedTeam != null;
+                    int startIndex = selectedTeam.indexOf("ID: ") + 4;
+                    int endIndex = selectedTeam.indexOf(")");
+                    int teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
+                    
+                    // Otteniamo il voto dallo spinner
+                    int voto = (Integer) votoSpinner.getValue();
+                    
+                    // Assegniamo il voto
+                    boolean ok = controller.assegnaVoto(giudice.getId(), teamId, voto);
+                    
+                    if (ok) {
+                        JOptionPane.showMessageDialog(this, 
+                                                     "Voto assegnato correttamente al team.", 
+                                                     "Successo", 
+                                                     JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, 
+                                                     "Errore nell'assegnazione del voto. Verifica che il team esista.", 
+                                                     "Errore", 
+                                                     JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, 
+                                                 "Si è verificato un errore: " + ex.getMessage(), 
+                                                 "Errore", 
+                                                 JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
-        btnVisualizzaClassifica.addActionListener(e -> {
+        b3.addActionListener(_ -> {
             Classifica classifica = controller.getClassifica();
-            JOptionPane.showMessageDialog(this, classifica);
+            if (classifica.getTeams().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nessuna classifica disponibile.");
+                return;
+            }
+            StringBuilder sb = new StringBuilder("Classifica (basata sulla media dei voti):\n");
+            int pos = 1;
+            for (Team t : classifica.getTeams()) {
+                sb.append(pos++).append(". ").append(t.getNome())
+                        .append(" - Media: ").append(String.format("%.2f", t.getPunteggioMedio()))
+                        .append(" (").append(t.getVoti().size()).append(" voti)").append("\n");
+            }
+            JOptionPane.showMessageDialog(this, sb.toString());
         });
 
-        btnLogout.addActionListener(e -> {
-            this.dispose();
+        b4.addActionListener(_ -> {
             finestraLogin.setVisible(true);
+            dispose();
         });
-
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.add(btnValutaTeam);
-        panel.add(btnVisualizzaClassifica);
-        panel.add(btnLogout);
-
-        add(panel);
     }
 }

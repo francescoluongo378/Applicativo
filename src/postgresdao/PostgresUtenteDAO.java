@@ -13,7 +13,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     @Override
     public boolean salva(Utente u) {
         String sql = "INSERT INTO utente (nome,email,password,ruolo) VALUES (?,?,?,?)";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setString(1, u.getNome());
             p.setString(2, u.getEmail());
@@ -29,7 +29,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     @Override
     public Utente trovaPerEmail(String email) {
         String sql = "SELECT id, nome, email, password, ruolo FROM utente WHERE email=?";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setString(1, email);
             try (ResultSet r = p.executeQuery()) {
@@ -52,7 +52,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     @Override
     public Utente trovaPerId(int id) {
         String sql = "SELECT id, nome, email, password, ruolo FROM utente WHERE id=?";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setInt(1, id);
             try (ResultSet r = p.executeQuery()) {
@@ -76,7 +76,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     public List<Utente> findAll() {
         List<Utente> l = new ArrayList<>();
         String sql = "SELECT id, nome, email, password, ruolo FROM utente";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              Statement s = c.createStatement();
              ResultSet r = s.executeQuery(sql)) {
             while (r.next()) {
@@ -97,7 +97,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     @Override
     public boolean aggiorna(Utente utente) {
         String sql = "UPDATE utente SET nome=?, email=?, password=?, ruolo=? WHERE id=?";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setString(1, utente.getNome());
             p.setString(2, utente.getEmail());
@@ -114,7 +114,7 @@ public class PostgresUtenteDAO implements UtenteDAO {
     @Override
     public boolean elimina(int id) {
         String sql = "DELETE FROM utente WHERE id=?";
-        try (Connection c = ConnessioneDatabase.getConnection();
+        try (Connection c = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setInt(1, id);
             return p.executeUpdate() > 0;

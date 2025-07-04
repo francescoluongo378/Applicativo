@@ -24,13 +24,23 @@ public class Utente {
         this.ruolo = ruolo;
     }
 
-    public Utente(int id, String nome, String email, String organizzatore) {
+    public Utente(int id, String nome, String email, String ruolo) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.ruolo = ruolo;
     }
 
-    public Utente(String nome, String email, String organizzatore) {
+    public Utente(String nome, String email, String ruolo) {
+        this.nome = nome;
+        this.email = email;
+        this.ruolo = ruolo;
     }
 
     public Utente(int id, String nome, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
     }
 
     public Integer getId() {
@@ -53,6 +63,7 @@ public class Utente {
     }
 
     public void setPassword(String nuovaPassword) {
+        this.password = nuovaPassword;
     }
 }
 

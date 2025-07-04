@@ -14,9 +14,10 @@ public class Hackathon {
     private LocalDateTime inizioIscrizioni;
     private LocalDateTime fineIscrizioni;
     private int maxTeam;
-    private Classifica classifica;
-    private List<Giudice> giudici;
-    private List<Team> teams;
+    private final Classifica classifica;
+    private final List<Giudice> giudici;
+    private final List<Team> teams;
+    private final List<Partecipante> partecipanti;
 
     // Costruttori
     public Hackathon(String titolo, String sede, int maxPartecipanti,
@@ -33,13 +34,17 @@ public class Hackathon {
         this.maxTeam = maxTeam;
         this.giudici = new ArrayList<>();
         this.teams = new ArrayList<>();
+        this.partecipanti = new ArrayList<>();
         this.classifica = new Classifica();
+        System.out.println("DEBUG: Costruttore completo Hackathon, partecipanti inizializzato: " + true);
     }
 
     public Hackathon() {
         this.giudici = new ArrayList<>();
         this.teams = new ArrayList<>();
+        this.partecipanti = new ArrayList<>();
         this.classifica = new Classifica();
+        System.out.println("DEBUG: Costruttore default Hackathon, partecipanti inizializzato: " + true);
     }
 
     // Getter e Setter
@@ -135,11 +140,22 @@ public class Hackathon {
         classifica.aggiungiTeam(team);
     }
 
-    public void aggiungiGiudice(Giudice giudice) {
-        giudici.add(giudice);
-    }
-
     public List<Partecipante> getPartecipanti() {
-        return List.of();
+        System.out.println("DEBUG: getPartecipanti chiamato");
+        // Ensure we always return a mutable list
+        if (partecipanti == null) {
+            System.out.println("DEBUG: partecipanti è null, creando una nuova lista");
+            return new ArrayList<>();
+        }
+        System.out.println("DEBUG: partecipanti non è null, tipo: " + partecipanti.getClass().getName());
+        return partecipanti;
+    }
+    
+    public void setPartecipanti(List<Partecipante> nuoviPartecipanti) {
+        System.out.println("DEBUG: setPartecipanti chiamato con " + nuoviPartecipanti.size() + " partecipanti");
+        // Svuota la lista attuale
+        partecipanti.clear();
+        // Aggiungi i nuovi partecipanti
+        partecipanti.addAll(nuoviPartecipanti);
     }
 }

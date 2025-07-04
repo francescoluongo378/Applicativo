@@ -18,4 +18,21 @@ public class Classifica {
         return teams;
     }
 
+    @Override
+    public String toString() {
+        if (teams.isEmpty()) {
+            return "Nessun voto registrato.";
+        }
+        StringBuilder sb = new StringBuilder("Classifica:\n");
+        int pos = 1;
+        for (Team t : teams) {
+            sb.append(pos++)
+                    .append(". ")
+                    .append(t.getNome())
+                    .append(" – ")
+                    .append(t.getPuntiTotali())
+                    .append("\n");
+        }
+        return sb.toString();
+    }
 }

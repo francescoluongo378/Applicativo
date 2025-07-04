@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Team {
@@ -9,104 +8,68 @@ public class Team {
     private String nome;
     private String descrizione;
     private int progresso;
-    private int hackathonId;
-    private int puntiTotali;  // usato per la classifica
+    private int puntiTotali;
+    private Hackathon hackathon;
+    private List<Voto> voti;
 
-    public Team() {}  // costruttore vuoto necessario
+    public Team() {
+        voti = new ArrayList<>();
+    }
 
-    // Costruttore completo
-    public Team(int id, String nome, String descrizione, int progresso, int hackathonId) {
+    public Team(int id, String nome, Hackathon hackathon) {
         this.id = id;
         this.nome = nome;
-        this.descrizione = descrizione;
-        this.progresso = progresso;
-        this.hackathonId = hackathonId;
+        this.hackathon = hackathon;
+        this.voti = new ArrayList<>();
     }
 
-    // Costruttore usato nel DAO Classifica (id, nome, hackathonId)
-    public Team(int id, String nome, int hackathonId) {
-        this.id = id;
-        this.nome = nome;
-        this.hackathonId = hackathonId;
-    }
+    // Getter e setter
 
-    // Costruttore per il caso con solo nome (es. PostgresVotoDAO)
-    public Team(String nome) {
-        this.nome = nome;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    // getter e setter
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public int getId() {
-        return id;
-    }
+    public String getDescrizione() { return descrizione; }
+    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getProgresso() { return progresso; }
+    public void setProgresso(int progresso) { this.progresso = progresso; }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getDescrizione() {
-        return descrizione;
-    }
-
-    public void setDescrizione(String descrizione) {
-        this.descrizione = descrizione;
-    }
-
-    public int getProgresso() {
-        return progresso;
-    }
-
-    public void setProgresso(int progresso) {
-        this.progresso = progresso;
-    }
-
-    public int getHackathonId() {
-        return hackathonId;
-    }
-
-    public void setHackathonId(int hackathonId) {
-        this.hackathonId = hackathonId;
-    }
-
-    public int getPuntiTotali() {
-        return puntiTotali;
-    }
-
+    public Hackathon getHackathon() { return hackathon; }
+    public void setHackathon(Hackathon hackathon) { this.hackathon = hackathon; }
     public void setPuntiTotali(int puntiTotali) {
         this.puntiTotali = puntiTotali;
     }
+    public List<Voto> getVoti() { return voti; }
+    public void setVoti(List<Voto> voti) { this.voti = voti; }
 
-    @Override
-    public String toString() {
-        return "Team{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descrizione='" + descrizione + '\'' +
-                ", progresso=" + progresso +
-                ", hackathonId=" + hackathonId +
-                ", puntiTotali=" + puntiTotali +
-                '}';
+    public void aggiungiVoto(Voto voto) {
+        voti.add(voto);
     }
 
-
-    private List<Voto> voti = new ArrayList<>();
-
-    public void aggiungiVoto(Voto nuovoVoto) {
-        voti.add(nuovoVoto);
-        this.puntiTotali += nuovoVoto.getPunteggio();
+    public int getPuntiTotali() {
+        if (voti.isEmpty()) {
+            return 0;
+        }
+        
+        int somma = 0;
+        for (Voto v : voti) {
+            somma += v.getPunteggio();
+        }
+        return somma;
     }
-
-    public List<Voto> getVoti() {
-        return voti;
+    
+    public double getPunteggioMedio() {
+        if (voti.isEmpty()) {
+            return 0.0;
+        }
+        
+        int somma = 0;
+        for (Voto v : voti) {
+            somma += v.getPunteggio();
+        }
+        return (double) somma / voti.size();
     }
-
 }
