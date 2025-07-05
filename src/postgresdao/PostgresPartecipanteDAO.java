@@ -119,41 +119,6 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
     }
 
 
-
-
-
-    @Override
-    public List<Partecipante> findAllByHackathonId(int hackathonId) {
-        List<Partecipante> partecipanti = new ArrayList<>();
-        String sql = "SELECT p.id, u.nome, u.email, p.team_id FROM partecipante p JOIN utente u ON p.id = u.id";
-        
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                Partecipante p = new Partecipante(
-                    rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("email")
-                );
-                
-
-                int teamId = rs.getInt("team_id");
-                if (!rs.wasNull()) {
-                    p.setTeamId(teamId);
-                }
-                
-                partecipanti.add(p);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Errore nel recupero dei partecipanti: " + e.getMessage());
-        }
-        
-        return partecipanti;
-    }
-
     @Override
     public void salvaPartecipanteNelTeam(int idPartecipante, int idTeam) {
         try {

@@ -10,7 +10,6 @@ public interface PartecipanteDAO {
 
     List<Partecipante> findAll();
 
-    List<Partecipante> findAllByHackathonId(int hackathonId);
     boolean aggiorna(Partecipante p);
 
     void salvaPartecipanteNelTeam(int idPartecipante, int idTeam);

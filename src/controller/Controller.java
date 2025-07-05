@@ -3,7 +3,12 @@ package controller;
 import model.*;
 import dao.*;
 import postgresdao.*;
+import database.ConnessioneDatabase;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,24 +92,60 @@ public class Controller {
     // Metodi rimossi: invitaGiudice e invitaPartecipante
     
     public boolean aggiungiGiudice(String nome, String email) {
+        // Verifica che esista un hackathon
+        if (hackathon.getId() <= 0) {
+            boolean hackathonCreato = creaHackathonDefault();
+            if (!hackathonCreato) {
+                System.err.println("Impossibile creare un hackathon di default");
+                return false;
+            }
+        }
+        
         // Registriamo direttamente il giudice senza invito
         Optional<Utente> opt = registraUtente(nome, email, "changeme", "giudice");
         if (opt.isEmpty()) return false;
         Utente u = opt.get();
         Giudice g = new Giudice(u.getId(), u.getNome(), u.getEmail(), u.getPassword());
+        
+        // Salva il giudice nel database
         if (!giudiceDAO.salva(g)) return false;
+        
+        // Aggiorna l'oggetto hackathon in memoria
         hackathon.getGiudici().add(g);
+        
+        // Ricarica i giudici dal database per assicurarsi che siano aggiornati
+        caricaGiudiciDaDB();
+        
         return true;
     }
 
     public boolean aggiungiPartecipante(String nome, String email) {
+        // Verifica che esista un hackathon
+        if (hackathon.getId() <= 0) {
+            boolean hackathonCreato = creaHackathonDefault();
+            if (!hackathonCreato) {
+                System.err.println("Impossibile creare un hackathon di default");
+                return false;
+            }
+        }
+        
         // Registriamo direttamente il partecipante senza invito
         Optional<Utente> opt = registraUtente(nome, email, "changeme", "partecipante");
         if (opt.isEmpty()) return false;
         Utente u = opt.get();
         Partecipante p = new Partecipante(u.getId(), u.getNome(), u.getEmail(), u.getPassword());
+        
+        // Salva il partecipante nel database
         if (!partecipanteDAO.salva(p)) return false;
+        
+        // Aggiorna l'oggetto hackathon in memoria
         hackathon.getPartecipanti().add(p);
+        
+        // Aggiorna la lista dei partecipanti in memoria
+        List<Partecipante> partecipantiAggiornati = partecipanteDAO.findAll();
+        hackathon.getPartecipanti().clear();
+        hackathon.getPartecipanti().addAll(partecipantiAggiornati);
+        
         return true;
     }
 
@@ -231,31 +272,41 @@ public class Controller {
         }
         
         try {
-            // Verifica che il team esista
-            Team team = teamDAO.trovaPerId(idTeam);
-            if (team == null) {
-                // Ricarica i team dal database prima di verificare
-                caricaTeamsDaDB();
-                team = hackathon.getTeams().stream()
-                    .filter(t -> t.getId() == idTeam)
-                    .findFirst()
-                    .orElse(null);
-                
-                if (team == null) {
-                    System.err.println("Team non trovato con ID: " + idTeam);
+            // Verifica diretta nel database che il team esista
+            boolean teamEsiste = false;
+            try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement("SELECT id FROM team WHERE id = ?")) {
+                stmt.setInt(1, idTeam);
+                ResultSet rs = stmt.executeQuery();
+                teamEsiste = rs.next();
+            } catch (SQLException e) {
+                System.err.println("Errore nella verifica dell'esistenza del team: " + e.getMessage());
+                e.printStackTrace();
+            }
+            
+            if (!teamEsiste) {
+                System.err.println("Team con ID " + idTeam + " non esiste nel database");
+                return false;
+            }
+            
+            // Verifica che l'utente sia un giudice
+            Giudice giudice = giudiceDAO.trovaGiudicePerId(idGiudice);
+            if (giudice == null) {
+                // Prova a cercare l'utente e verificare che sia un giudice
+                Utente utente = utenteDAO.trovaPerId(idGiudice);
+                if (utente == null || !utente.getRuolo().equalsIgnoreCase("giudice")) {
+                    System.err.println("Utente non trovato o non è un giudice. ID: " + idGiudice);
                     return false;
                 }
             }
             
-            // Verifica che l'utente sia un giudice
-            Utente giudice = utenteDAO.trovaPerId(idGiudice);
-            if (giudice == null || !giudice.getRuolo().equalsIgnoreCase("giudice")) {
-                System.err.println("Utente non trovato o non è un giudice. ID: " + idGiudice);
-                return false;
-            }
-            
             // Crea e salva il voto
-            Voto voto = new Voto(idGiudice, idTeam, punteggio);
+            Voto voto = new Voto(idTeam, idGiudice, punteggio);
+            
+            // Stampa informazioni di debug
+            System.out.println("Tentativo di salvare voto: Giudice ID=" + idGiudice + 
+                              ", Team ID=" + idTeam + ", Punteggio=" + punteggio);
+            
             boolean ok = votoDAO.salvaVoto(voto);
             if (!ok) {
                 System.err.println("Errore nel salvataggio del voto");
@@ -263,11 +314,9 @@ public class Controller {
             }
     
             // Aggiorna la classifica in memoria
-            Classifica aggiornata = classificaDAO.getClassifica(hackathon.getId());
-            hackathon.getTeams().clear();
-            for (Team t : aggiornata.getTeams()) {
-                hackathon.aggiungiTeam(t);
-            }
+
+            // Aggiorna i team nell'hackathon con i dati aggiornati
+            caricaTeamsDaDB();
             
             System.out.println("Voto assegnato con successo: Giudice ID " + idGiudice + 
                                " ha votato il Team ID " + idTeam + " con punteggio " + punteggio);
@@ -281,9 +330,32 @@ public class Controller {
 
     // --- DOCUMENTI ---
     public boolean inviaDocumento(int idPartecipante, String nomeFile) {
-        int idTeam = getTeamIdByPartecipante(idPartecipante);
-        if (idTeam <= 0) return false;
+        // Verifica che il partecipante esista
+        Partecipante p = partecipanteDAO.findById(idPartecipante);
+        if (p == null) {
+            System.err.println("Partecipante non trovato con ID: " + idPartecipante);
+            return false;
+        }
+        
+        // Ottieni l'ID del team del partecipante
+        int idTeam = p.getTeamId();
+        if (idTeam <= 0) {
+            // Prova a recuperare l'ID del team direttamente dal database
+            idTeam = getTeamIdByPartecipante(idPartecipante);
+            if (idTeam <= 0) {
+                System.err.println("Il partecipante non è associato a nessun team");
+                return false;
+            }
+        }
 
+        // Verifica che il team esista
+        Team team = teamDAO.trovaPerId(idTeam);
+        if (team == null) {
+            System.err.println("Team non trovato con ID: " + idTeam);
+            return false;
+        }
+
+        // Crea e salva il documento
         Documento doc = new Documento();
         doc.setIdTeam(idTeam);
         doc.setTitolo(nomeFile);
@@ -294,73 +366,44 @@ public class Controller {
         return documentoDAO.findByTeam(idTeam);
     }
 
-    // --- PROGRESSO ---
-    public boolean aggiornaProgressoTeam(int idPartecipante, int incremento) {
-        try {
-            Partecipante p = partecipanteDAO.findById(idPartecipante);
-            if (p == null) {
-                System.err.println("Partecipante non trovato con ID: " + idPartecipante);
-                return false;
-            }
-            
-            int idTeam = p.getTeamId();
-            if (idTeam <= 0) {
-                System.err.println("Il partecipante non è associato a nessun team");
-                return false;
-            }
-            
-            // Ricarica i team dal database per assicurarsi di avere dati aggiornati
-            caricaTeamsDaDB();
-            
-            Optional<Team> teamOpt = hackathon.getTeams().stream()
-                    .filter(t -> t.getId() == idTeam)
-                    .findFirst();
-            
-            if (teamOpt.isEmpty()) {
-                // Se il team non è in memoria, proviamo a caricarlo direttamente dal database
-                Team team = teamDAO.trovaPerId(idTeam);
-                if (team == null) {
-                    System.err.println("Team non trovato con ID: " + idTeam);
-                    return false;
-                }
-                
-                // Aggiorna il progresso
-                int nuovoProgresso = Math.max(0, Math.min(100, team.getProgresso() + incremento));
-                team.setProgresso(nuovoProgresso);
-                boolean result = teamDAO.aggiorna(team);
-                
-                // Aggiorna anche la lista in memoria
-                if (result) {
-                    hackathon.getTeams().add(team);
-                }
-                
-                return result;
-            }
-            
-            Team team = teamOpt.get();
-            int nuovoProgresso = Math.max(0, Math.min(100, team.getProgresso() + incremento));
-            team.setProgresso(nuovoProgresso);
-            return teamDAO.aggiorna(team);
-        } catch (Exception e) {
-            System.err.println("Errore durante l'aggiornamento del progresso: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     // --- SUPPORTO ---
     public int getTeamIdByPartecipante(int idPartecipante) {
-        Partecipante p = partecipanteDAO.findById(idPartecipante);
-        if (p != null && p.getTeamId() > 0) {
-            return p.getTeamId();
+        try {
+            // Prima prova a ottenere il partecipante dal DAO
+            Partecipante p = partecipanteDAO.findById(idPartecipante);
+            if (p != null && p.getTeamId() > 0) {
+                return p.getTeamId();
+            }
+            
+            // Se non ha un team_id, prova a cercarlo direttamente nel database
+            try (Connection conn = database.ConnessioneDatabase.getInstance().getConnection()) {
+                String sql = "SELECT team_id FROM partecipante WHERE id = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setInt(1, idPartecipante);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            int teamId = rs.getInt("team_id");
+                            if (!rs.wasNull()) {
+                                return teamId;
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante la ricerca del team del partecipante: " + e.getMessage());
+                e.printStackTrace();
+            }
+            
+            return -1; // Nessuna associazione a team trovata
+        } catch (Exception e) {
+            System.err.println("Errore durante il recupero del team del partecipante: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
         }
-        return -1; // No team association found
     }
     
     public PartecipanteDAO getPartecipanteDAO() {
         return partecipanteDAO;
     }
-    
-
-    }
+}
 

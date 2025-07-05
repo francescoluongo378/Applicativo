@@ -54,30 +54,30 @@ public class FinestraGiudice extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nessun team presente da valutare.");
                 return;
             }
-            
+
             // Creiamo un array di stringhe per il JComboBox
             String[] teamOptions = new String[teams.size()];
             for (int i = 0; i < teams.size(); i++) {
                 Team t = teams.get(i);
                 teamOptions[i] = t.getNome() + " (ID: " + t.getId() + ")";
             }
-            
+
             // Mostriamo un JComboBox per selezionare il team
             JComboBox<String> teamCombo = new JComboBox<>(teamOptions);
             JPanel panel = new JPanel(new GridLayout(0, 1));
             panel.add(new JLabel("Seleziona il team da valutare:"));
             panel.add(teamCombo);
-            
+
             // Aggiungiamo uno spinner per il voto
             SpinnerNumberModel votoModel = new SpinnerNumberModel(7, 1, 10, 1);
             JSpinner votoSpinner = new JSpinner(votoModel);
             panel.add(new JLabel("Voto (1-10):"));
             panel.add(votoSpinner);
-            
-            int result = JOptionPane.showConfirmDialog(this, panel, "Valuta Team", 
-                                                      JOptionPane.OK_CANCEL_OPTION, 
-                                                      JOptionPane.PLAIN_MESSAGE);
-            
+
+            int result = JOptionPane.showConfirmDialog(this, panel, "Valuta Team",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     // Estraiamo l'ID del team dalla stringa selezionata
@@ -86,30 +86,47 @@ public class FinestraGiudice extends JFrame {
                     int startIndex = selectedTeam.indexOf("ID: ") + 4;
                     int endIndex = selectedTeam.indexOf(")");
                     int teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
-                    
+
+                    // Verifichiamo che il team esista nella lista caricata
+                    boolean teamEsiste = false;
+                    for (Team t : teams) {
+                        if (t.getId() == teamId) {
+                            teamEsiste = true;
+                            break;
+                        }
+                    }
+
+                    if (!teamEsiste) {
+                        JOptionPane.showMessageDialog(this,
+                                "Il team selezionato (ID: " + teamId + ") non esiste più nel database. Ricarica la lista dei team.",
+                                "Errore",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     // Otteniamo il voto dallo spinner
                     int voto = (Integer) votoSpinner.getValue();
-                    
+
                     // Assegniamo il voto
                     boolean ok = controller.assegnaVoto(giudice.getId(), teamId, voto);
-                    
+
                     if (ok) {
-                        JOptionPane.showMessageDialog(this, 
-                                                     "Voto assegnato correttamente al team.", 
-                                                     "Successo", 
-                                                     JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(this,
+                                "Voto assegnato correttamente al team.",
+                                "Successo",
+                                JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(this, 
-                                                     "Errore nell'assegnazione del voto. Verifica che il team esista.", 
-                                                     "Errore", 
-                                                     JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this,
+                                "Errore nell'assegnazione del voto. Verifica che il team esista.",
+                                "Errore",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, 
-                                                 "Si è verificato un errore: " + ex.getMessage(), 
-                                                 "Errore", 
-                                                 JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            "Si è verificato un errore: " + ex.getMessage(),
+                            "Errore",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

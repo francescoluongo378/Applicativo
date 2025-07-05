@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.SpinnerNumberModel;
 
 public class Gui extends JFrame {
 
@@ -22,7 +23,7 @@ public class Gui extends JFrame {
     private JPanel panelOperativo;
 
     public Gui() {
-        // usa il costruttore no-arg del Controller
+
         controller = new Controller();
 
         setTitle("Hackathon Manager");
@@ -114,8 +115,8 @@ public class Gui extends JFrame {
                     utenteLoggato = opt.get();
                     JOptionPane.showMessageDialog(this, "Registrazione avvenuta con successo!");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Errore nella registrazione! Verifica che l'email non sia già in uso.", 
-                                                 "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Errore nella registrazione! Verifica che l'email non sia già in uso.",
+                            "Errore", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -175,28 +176,67 @@ public class Gui extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nessun team disponibile da valutare.");
                 return;
             }
-            
-            // Mostriamo la lista dei team
-            StringBuilder teamList = new StringBuilder("Team disponibili:\n");
-            for (Team t : teams) {
-                teamList.append("- ").append(t.getNome()).append(" (ID: ").append(t.getId()).append(")\n");
+
+            // Creiamo un array di stringhe per il JComboBox
+            String[] teamOptions = new String[teams.size()];
+            for (int i = 0; i < teams.size(); i++) {
+                Team t = teams.get(i);
+                teamOptions[i] = t.getNome() + " (ID: " + t.getId() + ")";
             }
-            JOptionPane.showMessageDialog(this, teamList.toString());
-            
-            // Chiediamo l'ID del team e il voto
-            String teamIdStr = JOptionPane.showInputDialog(this, "ID del team da valutare:");
-            String v = JOptionPane.showInputDialog(this, "Voto 1-10:");
-            
-            try {
-                int teamId = Integer.parseInt(teamIdStr);
-                int voto = Integer.parseInt(v);
-                
-                // Utilizziamo l'ID del giudice loggato
-                int idGiudiceLoggato = controller.getUtenteLoggato().getId();
-                boolean ok = controller.assegnaVoto(idGiudiceLoggato, teamId, voto);
-                JOptionPane.showMessageDialog(this, ok ? "Voto assegnato con successo" : "Errore nell'assegnazione del voto");
-            } catch(Exception ex) {
-                JOptionPane.showMessageDialog(this, "Voto o ID team non valido");
+
+            // Mostriamo un JComboBox per selezionare il team
+            JComboBox<String> teamCombo = new JComboBox<>(teamOptions);
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Seleziona il team da valutare:"));
+            panel.add(teamCombo);
+
+            // Aggiungiamo uno spinner per il voto
+            SpinnerNumberModel votoModel = new SpinnerNumberModel(7, 1, 10, 1);
+            JSpinner votoSpinner = new JSpinner(votoModel);
+            panel.add(new JLabel("Voto (1-10):"));
+            panel.add(votoSpinner);
+
+            int result = JOptionPane.showConfirmDialog(this, panel, "Valuta Team",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    // Estraiamo l'ID del team dalla stringa selezionata
+                    String selectedTeam = (String) teamCombo.getSelectedItem();
+                    assert selectedTeam != null;
+                    int startIndex = selectedTeam.indexOf("ID: ") + 4;
+                    int endIndex = selectedTeam.indexOf(")");
+                    int teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
+
+                    // Verifichiamo che il team esista nella lista caricata
+                    boolean teamEsiste = false;
+                    for (Team t : teams) {
+                        if (t.getId() == teamId) {
+                            teamEsiste = true;
+                            break;
+                        }
+                    }
+
+                    if (!teamEsiste) {
+                        JOptionPane.showMessageDialog(this,
+                                "Il team selezionato (ID: " + teamId + ") non esiste più nel database. Ricarica la lista dei team.",
+                                "Errore",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // Otteniamo il voto dallo spinner
+                    int voto = (Integer) votoSpinner.getValue();
+
+                    // Utilizziamo l'ID del giudice loggato
+                    int idGiudiceLoggato = controller.getUtenteLoggato().getId();
+                    boolean ok = controller.assegnaVoto(idGiudiceLoggato, teamId, voto);
+                    JOptionPane.showMessageDialog(this, ok ? "Voto assegnato con successo" : "Errore nell'assegnazione del voto");
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Si è verificato un errore: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         btnLogout.addActionListener(_ -> {

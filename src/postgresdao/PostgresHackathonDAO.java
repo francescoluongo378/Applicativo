@@ -59,13 +59,7 @@ public class PostgresHackathonDAO implements HackathonDAO {
                 h.setSede(rs.getString("sede"));
                 h.setMaxPartecipanti(rs.getInt("max_partecipanti"));
                 h.setMaxTeam(rs.getInt("max_team"));
-                
-                // Gestione delle date se necessario
-                // h.setDataInizio(rs.getTimestamp("data_inizio").toLocalDateTime());
-                // h.setDataFine(rs.getTimestamp("data_fine").toLocalDateTime());
-                // h.setInizioIscrizioni(rs.getTimestamp("inizio_iscrizioni").toLocalDateTime());
-                // h.setFineIscrizioni(rs.getTimestamp("fine_iscrizioni").toLocalDateTime());
-                
+
                 return h;
             }
         } catch (SQLException e) {
@@ -91,12 +85,7 @@ public class PostgresHackathonDAO implements HackathonDAO {
                 h.setMaxPartecipanti(rs.getInt("max_partecipanti"));
                 h.setMaxTeam(rs.getInt("max_team"));
                 
-                // Gestione delle date se necessario
-                // h.setDataInizio(rs.getTimestamp("data_inizio").toLocalDateTime());
-                // h.setDataFine(rs.getTimestamp("data_fine").toLocalDateTime());
-                // h.setInizioIscrizioni(rs.getTimestamp("inizio_iscrizioni").toLocalDateTime());
-                // h.setFineIscrizioni(rs.getTimestamp("fine_iscrizioni").toLocalDateTime());
-                
+
                 result.add(h);
             }
         } catch (SQLException e) {

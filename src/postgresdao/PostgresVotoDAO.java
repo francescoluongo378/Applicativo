@@ -5,8 +5,6 @@ import database.ConnessioneDatabase;
 import model.Voto;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PostgresVotoDAO implements VotoDAO {
 
@@ -34,6 +32,7 @@ public class PostgresVotoDAO implements VotoDAO {
                     updateStmt.setInt(1, punteggio);
                     updateStmt.setInt(2, votoId);
                     int rowsUpdated = updateStmt.executeUpdate();
+                    System.out.println("Voto aggiornato con ID: " + votoId + ", righe modificate: " + rowsUpdated);
                     return rowsUpdated > 0;
                 }
             } else {
@@ -43,67 +42,54 @@ public class PostgresVotoDAO implements VotoDAO {
                     insertStmt.setInt(1, idGiudice);
                     insertStmt.setInt(2, idTeam);
                     insertStmt.setInt(3, punteggio);
+                    
+                    // Stampa i valori che stiamo per inserire
+                    System.out.println("Inserimento voto: id_giudice=" + idGiudice + 
+                                      ", id_team=" + idTeam + ", punteggio=" + punteggio);
+                    
                     int rowsInserted = insertStmt.executeUpdate();
+                    System.out.println("Nuovo voto inserito, righe inserite: " + rowsInserted);
                     return rowsInserted > 0;
                 }
             }
         } catch (SQLException e) {
             System.err.println("Errore durante il salvataggio del voto: " + e.getMessage());
             e.printStackTrace();
+            
+            // Verifichiamo se il problema è legato a vincoli di chiave esterna
+            if (e.getMessage().contains("foreign key") || e.getMessage().contains("violates foreign key")) {
+                System.err.println("Errore di chiave esterna. Verifica che il giudice (ID: " + idGiudice + 
+                                  ") e il team (ID: " + idTeam + ") esistano nel database.");
+                
+                // Verifica se il giudice esiste
+                try (Connection conn = ConnessioneDatabase.getInstance().getConnection()) {
+                    String checkGiudice = "SELECT id_utente FROM giudice WHERE id_utente = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(checkGiudice)) {
+                        stmt.setInt(1, idGiudice);
+                        ResultSet rs = stmt.executeQuery();
+                        if (!rs.next()) {
+                            System.err.println("Il giudice con ID " + idGiudice + " non esiste nella tabella giudice.");
+                        }
+                    }
+                    
+                    // Verifica se il team esiste
+                    String checkTeam = "SELECT id FROM team WHERE id = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(checkTeam)) {
+                        stmt.setInt(1, idTeam);
+                        ResultSet rs = stmt.executeQuery();
+                        if (!rs.next()) {
+                            System.err.println("Il team con ID " + idTeam + " non esiste nella tabella team.");
+                        }
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            
             return false;
         }
     }
 
-    @Override
-    public List<Voto> listaVoti() {
-        List<Voto> voti = new ArrayList<>();
-        String sql = "SELECT id_giudice, id_team, punteggio FROM voto";
-
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                int idGiudice = rs.getInt("id_giudice");
-                int idTeam = rs.getInt("id_team");
-                int punteggio = rs.getInt("punteggio");
-                voti.add(new Voto(idGiudice, idTeam, punteggio));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Errore nella lettura dei voti: " + e.getMessage());
-        }
-
-        return voti;
-    }
-
-    @Override
-    public List<Voto> listaVotiPerTeam(int idTeam) {
-        List<Voto> voti = new ArrayList<>();
-        String query = "SELECT id_team, id_giudice, punteggio FROM voto WHERE id_team = ?";
-
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, idTeam);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int teamId = rs.getInt("id_team");
-                int giudiceId = rs.getInt("id_giudice");
-                int punteggio = rs.getInt("punteggio");
-
-                Voto voto = new Voto(giudiceId, teamId, punteggio);
-                voti.add(voto);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return voti;
-    }
-    
     @Override
     public boolean aggiorna(Voto voto) {
         // Utilizziamo il metodo salvaVoto che già gestisce l'aggiornamento se il voto esiste

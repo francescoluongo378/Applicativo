@@ -45,18 +45,18 @@ public class FinestraOrganizzatore extends JFrame {
             String sede = JOptionPane.showInputDialog(this, "Sede dell'Hackathon:");
             String maxPartecipantiStr = JOptionPane.showInputDialog(this, "Numero massimo di partecipanti:");
             String maxTeamStr = JOptionPane.showInputDialog(this, "Numero massimo di team:");
-            
+
             try {
                 int maxPartecipanti = Integer.parseInt(maxPartecipantiStr);
                 int maxTeam = Integer.parseInt(maxTeamStr);
-                
+
                 boolean ok = ctrl.creaHackathon(titolo, sede, maxPartecipanti, maxTeam);
                 JOptionPane.showMessageDialog(this, ok ? "Hackathon creato con successo!" : "Errore nella creazione dell'Hackathon.");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Inserisci valori numerici validi per i limiti.");
             }
         });
-        
+
         b2.addActionListener(_ -> {
             // Chiedi nome e email per aggiungere direttamente il giudice
             String nome = JOptionPane.showInputDialog(this, "Nome del giudice:");
@@ -64,8 +64,8 @@ public class FinestraOrganizzatore extends JFrame {
                 String email = JOptionPane.showInputDialog(this, "Email del giudice:");
                 if (email != null && !email.isBlank()) {
                     boolean ok = ctrl.aggiungiGiudice(nome, email);
-                    JOptionPane.showMessageDialog(this, ok ? 
-                            "Giudice aggiunto con successo!" : 
+                    JOptionPane.showMessageDialog(this, ok ?
+                            "Giudice aggiunto con successo!" :
                             "Errore nell'aggiunta del giudice.");
                 } else {
                     JOptionPane.showMessageDialog(this, "L'email è obbligatoria.");
@@ -74,7 +74,7 @@ public class FinestraOrganizzatore extends JFrame {
                 JOptionPane.showMessageDialog(this, "Il nome è obbligatorio.");
             }
         });
-        
+
         b3.addActionListener(_ -> {
             // Chiedi nome e email per aggiungere direttamente il partecipante
             String nome = JOptionPane.showInputDialog(this, "Nome del partecipante:");
@@ -82,8 +82,8 @@ public class FinestraOrganizzatore extends JFrame {
                 String email = JOptionPane.showInputDialog(this, "Email del partecipante:");
                 if (email != null && !email.isBlank()) {
                     boolean ok = ctrl.aggiungiPartecipante(nome, email);
-                    JOptionPane.showMessageDialog(this, ok ? 
-                            "Partecipante aggiunto con successo!" : 
+                    JOptionPane.showMessageDialog(this, ok ?
+                            "Partecipante aggiunto con successo!" :
                             "Errore nell'aggiunta del partecipante.");
                 } else {
                     JOptionPane.showMessageDialog(this, "L'email è obbligatoria.");
@@ -92,7 +92,7 @@ public class FinestraOrganizzatore extends JFrame {
                 JOptionPane.showMessageDialog(this, "Il nome è obbligatorio.");
             }
         });
-        
+
         b4.addActionListener(_ -> {
             ctrl.caricaTeamsDaDB();
             List<Team> teams = ctrl.getListaTeam();
@@ -100,11 +100,11 @@ public class FinestraOrganizzatore extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nessun team presente.");
                 return;
             }
-            
+
             StringBuilder sb = new StringBuilder("Teams:\n");
             for (Team t : teams) {
                 sb.append("- ").append(t.getNome())
-                  .append(" (Progresso: ").append(t.getProgresso()).append("%)\n");
+                        .append(" (Progresso: ").append(t.getProgresso()).append("%)\n");
             }
             JOptionPane.showMessageDialog(this, sb.toString());
         });
@@ -125,7 +125,7 @@ public class FinestraOrganizzatore extends JFrame {
             }
             JOptionPane.showMessageDialog(this, sb.toString());
         });
-        
+
         b6.addActionListener(_ -> {
             // Ottieni l'hackathon corrente
             Hackathon hackathon = ctrl.getHackathon();
@@ -133,37 +133,41 @@ public class FinestraOrganizzatore extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nessun hackathon disponibile.");
                 return;
             }
-            
+
             // Carica i dati aggiornati
             ctrl.caricaTeamsDaDB();
             ctrl.caricaGiudiciDaDB();
-            
+
             try {
                 // Usa un approccio diverso per caricare i partecipanti
                 List<Partecipante> partecipanti = ctrl.getPartecipanteDAO().findAll();
-                
+
                 // Crea un messaggio con le informazioni dell'hackathon
-                StringBuilder sb = new StringBuilder("Informazioni Hackathon:\n\n");
-                sb.append("Titolo: ").append(hackathon.getTitolo()).append("\n");
-                sb.append("Sede: ").append(hackathon.getSede()).append("\n");
-                sb.append("Max Partecipanti: ").append(hackathon.getMaxPartecipanti()).append("\n");
-                sb.append("Max Team: ").append(hackathon.getMaxTeam()).append("\n\n");
-                
-                sb.append("Numero di Team: ").append(hackathon.getTeams().size()).append("\n");
-                sb.append("Numero di Giudici: ").append(hackathon.getGiudici().size()).append("\n");
-                sb.append("Numero di Partecipanti: ").append(partecipanti.size()).append("\n");
-                
-                // Mostra le informazioni
-                JTextArea textArea = new JTextArea(sb.toString());
-                textArea.setEditable(false);
-                JScrollPane scrollPane = new JScrollPane(textArea);
-                scrollPane.setPreferredSize(new Dimension(400, 300));
-                
+
+                JScrollPane scrollPane = getJScrollPane(hackathon, partecipanti);
+
                 JOptionPane.showMessageDialog(this, scrollPane, "Informazioni Hackathon", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Errore nel caricamento delle informazioni: " + ex.getMessage());
             }
         });
+    }
+
+    private static JScrollPane getJScrollPane(Hackathon hackathon, List<Partecipante> partecipanti) {
+        String sb = "Informazioni Hackathon:\n\n" + "Titolo: " + hackathon.getTitolo() + "\n" +
+                "Sede: " + hackathon.getSede() + "\n" +
+                "Max Partecipanti: " + hackathon.getMaxPartecipanti() + "\n" +
+                "Max Team: " + hackathon.getMaxTeam() + "\n\n" +
+                "Numero di Team: " + hackathon.getTeams().size() + "\n" +
+                "Numero di Giudici: " + hackathon.getGiudici().size() + "\n" +
+                "Numero di Partecipanti: " + partecipanti.size() + "\n";
+
+        // Mostra le informazioni
+        JTextArea textArea = new JTextArea(sb);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+        return scrollPane;
     }
 }
