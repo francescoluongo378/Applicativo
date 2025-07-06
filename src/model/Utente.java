@@ -2,8 +2,8 @@ package model;
 
 public class Utente {
     private Integer id;
-    private String nome;
-    private String email;
+    private final String nome;
+    private final String email;
     private String password;
     private String ruolo;
 
@@ -62,8 +62,5 @@ public class Utente {
         this.id = id;
     }
 
-    public void setPassword(String nuovaPassword) {
-        this.password = nuovaPassword;
-    }
 }
 

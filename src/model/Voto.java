@@ -2,24 +2,12 @@ package model;
 
 public class Voto {
     private int id;         // opzionale, id nel database
-    private int idTeam;
-    private int idGiudice;
-    private int punteggio;
-
-    public Voto() {
-        // costruttore vuoto
-    }
+    private final int idTeam;
+    private final int idGiudice;
+    private final int punteggio;
 
     // costruttore senza id (nuovo voto)
     public Voto(int idTeam, int idGiudice, int punteggio) {
-        this.idTeam = idTeam;
-        this.idGiudice = idGiudice;
-        this.punteggio = punteggio;
-    }
-
-    // costruttore completo con id
-    public Voto(int id, int idTeam, int idGiudice, int punteggio) {
-        this.id = id;
         this.idTeam = idTeam;
         this.idGiudice = idGiudice;
         this.punteggio = punteggio;
@@ -38,24 +26,12 @@ public class Voto {
         return idTeam;
     }
 
-    public void setIdTeam(int idTeam) {
-        this.idTeam = idTeam;
-    }
-
     public int getIdGiudice() {
         return idGiudice;
     }
 
-    public void setIdGiudice(int idGiudice) {
-        this.idGiudice = idGiudice;
-    }
-
     public int getPunteggio() {
         return punteggio;
-    }
-
-    public void setPunteggio(int punteggio) {
-        this.punteggio = punteggio;
     }
 
     @Override
@@ -71,8 +47,7 @@ public class Voto {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Voto)) return false;
-        Voto voto = (Voto) o;
+        if (!(o instanceof Voto voto)) return false;
         return idTeam == voto.idTeam &&
                 idGiudice == voto.idGiudice &&
                 punteggio == voto.punteggio;

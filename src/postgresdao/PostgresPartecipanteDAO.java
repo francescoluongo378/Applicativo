@@ -9,7 +9,7 @@ import java.util.List;
 public class PostgresPartecipanteDAO implements PartecipanteDAO {
 
     @Override
-    public boolean salvaPartecipante(Partecipante partecipante) {
+    public void salvaPartecipante(Partecipante partecipante) {
 
         if (partecipante.getId() != null && partecipante.getId() > 0) {
             String sql = "INSERT INTO partecipante (id, team_id) VALUES (?, ?)";
@@ -24,9 +24,8 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
                 } else {
                     stmt.setNull(2, java.sql.Types.INTEGER);
                 }
-                
-                int rows = stmt.executeUpdate();
-                return rows > 0;
+
+                stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.err.println("Errore nel salvataggio del partecipante: " + e.getMessage());
@@ -35,7 +34,6 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
             // If the participant doesn't have an ID, this is an error
             System.err.println("Errore: tentativo di salvare un partecipante senza ID");
         }
-        return false;
     }
 
     @Override

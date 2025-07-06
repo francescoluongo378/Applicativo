@@ -8,7 +8,6 @@ public class Team {
     private String nome;
     private String descrizione;
     private int progresso;
-    private int puntiTotali;
     private Hackathon hackathon;
     private List<Voto> voti;
 
@@ -39,15 +38,9 @@ public class Team {
 
     public Hackathon getHackathon() { return hackathon; }
     public void setHackathon(Hackathon hackathon) { this.hackathon = hackathon; }
-    public void setPuntiTotali(int puntiTotali) {
-        this.puntiTotali = puntiTotali;
-    }
+
     public List<Voto> getVoti() { return voti; }
     public void setVoti(List<Voto> voti) { this.voti = voti; }
-
-    public void aggiungiVoto(Voto voto) {
-        voti.add(voto);
-    }
 
     public int getPuntiTotali() {
         if (voti.isEmpty()) {

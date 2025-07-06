@@ -9,8 +9,8 @@ public interface TeamDAO {
     List<Team> findAllByHackathonId(int hackathonId);
     boolean aggiorna(Team team);
     boolean elimina(int id);
-    boolean aggiornaProgresso(int idTeam, int nuovoProgresso);
-    boolean aggiornaProgresso(String nomeTeam, int progresso);
+
+
 
     Team trovaTeamPerNome(String nome);
     Team trovaPerId(int id);

@@ -13,27 +13,26 @@ public class PostgresGiudiceDAO implements GiudiceDAO {
 
     @Override
     public boolean salva(Giudice giudice) {
-        Utente u = giudice;
         PostgresUtenteDAO utenteDAO = new PostgresUtenteDAO();
-        Utente utenteEsistente = utenteDAO.trovaPerEmail(u.getEmail());
+        Utente utenteEsistente = utenteDAO.trovaPerEmail(giudice.getEmail());
 
         if (utenteEsistente == null) {
-            boolean ok = utenteDAO.salva(u);
+            boolean ok = utenteDAO.salva(giudice);
             if (!ok) return false;
-            utenteEsistente = utenteDAO.trovaPerEmail(u.getEmail());
+            utenteEsistente = utenteDAO.trovaPerEmail(giudice.getEmail());
             if (utenteEsistente == null) return false;
-            u.setId(utenteEsistente.getId());
+            giudice.setId(utenteEsistente.getId());
         } else {
-            u.setId(utenteEsistente.getId());
+            giudice.setId(utenteEsistente.getId());
         }
 
-        if (trovaGiudicePerId(u.getId()) != null) return true;
+        if (trovaGiudicePerId(giudice.getId()) != null) return true;
 
         String sql = "INSERT INTO giudice (id_utente) VALUES (?)";
 
         try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, u.getId());
+            stmt.setInt(1, giudice.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

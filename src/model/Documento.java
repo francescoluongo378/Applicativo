@@ -3,16 +3,9 @@ package model;
 public class Documento {
     private int id;
     private String titolo;
-    private int idPartecipante;
     private int idTeam;
 
     public Documento() {
-    }
-
-    public Documento(int id, String titolo, int idTeam) {
-        this.id = id;
-        this.titolo = titolo;
-        this.idTeam = idTeam;
     }
 
     public int getId() {
@@ -21,10 +14,6 @@ public class Documento {
 
     public String getTitolo() {
         return titolo;
-    }
-
-    public int getIdPartecipante() {
-        return idPartecipante;
     }
 
     public int getIdTeam() {
@@ -37,10 +26,6 @@ public class Documento {
 
     public void setTitolo(String titolo) {
         this.titolo = titolo;
-    }
-
-    public void setIdPartecipante(int idPartecipante) {
-        this.idPartecipante = idPartecipante;
     }
 
     public void setIdTeam(int idTeam) {

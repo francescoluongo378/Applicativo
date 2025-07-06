@@ -19,26 +19,7 @@ public class Hackathon {
     private final List<Team> teams;
     private final List<Partecipante> partecipanti;
 
-    // Costruttori
-    public Hackathon(String titolo, String sede, int maxPartecipanti,
-                     LocalDateTime dataInizio, LocalDateTime dataFine,
-                     LocalDateTime inizioIscrizioni, LocalDateTime fineIscrizioni,
-                     int maxTeam) {
-        this.titolo = titolo;
-        this.sede = sede;
-        this.maxPartecipanti = maxPartecipanti;
-        this.dataInizio = dataInizio;
-        this.dataFine = dataFine;
-        this.inizioIscrizioni = inizioIscrizioni;
-        this.fineIscrizioni = fineIscrizioni;
-        this.maxTeam = maxTeam;
-        this.giudici = new ArrayList<>();
-        this.teams = new ArrayList<>();
-        this.partecipanti = new ArrayList<>();
-        this.classifica = new Classifica();
-        System.out.println("DEBUG: Costruttore completo Hackathon, partecipanti inizializzato: " + true);
-    }
-
+    // Costruttore
     public Hackathon() {
         this.giudici = new ArrayList<>();
         this.teams = new ArrayList<>();
@@ -120,11 +101,7 @@ public class Hackathon {
         this.maxTeam = maxTeam;
     }
 
-    public Classifica getClassifica() {
-        return classifica;
-    }
-
-    public List<Giudice> getGiudici() {
+     public List<Giudice> getGiudici() {
         return new ArrayList<>(giudici);
     }
 
@@ -142,7 +119,7 @@ public class Hackathon {
 
     public List<Partecipante> getPartecipanti() {
         System.out.println("DEBUG: getPartecipanti chiamato");
-        // Ensure we always return a mutable list
+
         if (partecipanti == null) {
             System.out.println("DEBUG: partecipanti è null, creando una nuova lista");
             return new ArrayList<>();
@@ -150,12 +127,5 @@ public class Hackathon {
         System.out.println("DEBUG: partecipanti non è null, tipo: " + partecipanti.getClass().getName());
         return partecipanti;
     }
-    
-    public void setPartecipanti(List<Partecipante> nuoviPartecipanti) {
-        System.out.println("DEBUG: setPartecipanti chiamato con " + nuoviPartecipanti.size() + " partecipanti");
-        // Svuota la lista attuale
-        partecipanti.clear();
-        // Aggiungi i nuovi partecipanti
-        partecipanti.addAll(nuoviPartecipanti);
-    }
+
 }

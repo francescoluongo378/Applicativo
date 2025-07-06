@@ -4,7 +4,7 @@ import model.*;
 import java.util.List;
 public interface PartecipanteDAO {
     boolean salva(Partecipante p);
-    boolean salvaPartecipante(Partecipante p);
+    void salvaPartecipante(Partecipante p);
     Partecipante trovaPartecipantePerId(String id);
     Partecipante findById(int id);
 

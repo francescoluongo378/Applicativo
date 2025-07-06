@@ -39,25 +39,6 @@ public class PostgresTeamDAO implements TeamDAO {
     }
 
     @Override
-    public boolean aggiornaProgresso(int idTeam, int nuovoProgresso) {
-        String sql = "UPDATE team SET progresso = ? WHERE id = ?";
-
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, nuovoProgresso);
-            stmt.setInt(2, idTeam);
-
-            int righe = stmt.executeUpdate();
-            return righe > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
     public List<Team> findAllByHackathonId(int hackathonId) {
         List<Team> teams = new ArrayList<>();
         String sql = "SELECT * FROM team WHERE hackathon_id = ?";
@@ -128,24 +109,6 @@ public class PostgresTeamDAO implements TeamDAO {
         }
     }
 
-    @Override
-    public boolean aggiornaProgresso(String nomeTeam, int progresso) {
-        String sql = "UPDATE team SET progresso = ? WHERE nome = ?";
-
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, progresso);
-            stmt.setString(2, nomeTeam);
-
-            int righe = stmt.executeUpdate();
-            return righe > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     @Override
     public Team trovaTeamPerNome(String nome) {

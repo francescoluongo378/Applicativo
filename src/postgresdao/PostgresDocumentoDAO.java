@@ -32,37 +32,6 @@ public class PostgresDocumentoDAO implements DocumentoDAO {
     }
 
     @Override
-    public List<Documento> getDocumentiPerPartecipante(int idPartecipante) {
-        List<Documento> documenti = new ArrayList<>();
-        
-        // Prima troviamo il team_id del partecipante
-        String teamSql = "SELECT team_id FROM partecipante WHERE id = ?";
-        int teamId = -1;
-        
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(teamSql)) {
-            stmt.setInt(1, idPartecipante);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                teamId = rs.getInt("team_id");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Errore durante il recupero del team del partecipante: " + e.getMessage());
-            return documenti;
-        }
-        
-        // Se non abbiamo trovato un team, restituiamo una lista vuota
-        if (teamId <= 0) {
-            return documenti;
-        }
-        
-        // Ora recuperiamo i documenti del team
-        return findByTeam(teamId);
-    }
-
-    @Override
     public List<Documento> findByTeam(int idTeam) {
         List<Documento> documenti = new ArrayList<>();
         String sql = "SELECT * FROM documento WHERE id_team = ?";

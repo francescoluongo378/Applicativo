@@ -88,41 +88,46 @@ public class Gui extends JFrame {
         panelLogin.add(btnLogin, gbc);
 
         btnLogin.addActionListener(_ -> {
+            // Leggi dati form
             String nome = txtNome.getText().trim();
             String email = txtEmail.getText().trim();
-            String pwd   = new String(txtPassword.getPassword());
+            String pwd = new String(txtPassword.getPassword());
             String ruolo = (String) comboRuolo.getSelectedItem();
 
+            // Verifica campi
             if (nome.isEmpty() || email.isEmpty() || pwd.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Compila tutti i campi!", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Gui.this, "Compila tutti i campi!", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Provo login
-            Optional<Utente> opt = controller.login(email, pwd);
-            if (opt.isPresent()) {
-                utenteLoggato = opt.get();
+            // Prova login
+            Optional<Utente> risultato = controller.login(email, pwd);
+            
+            // Se login ok
+            if (risultato.isPresent()) {
+                utenteLoggato = risultato.get();
+                
+                // Verifica ruolo
                 if (!utenteLoggato.getRuolo().equalsIgnoreCase(ruolo)) {
-                    JOptionPane.showMessageDialog(this,
-                            "Ruolo errato rispetto alla registrazione precedente!",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(Gui.this, "Ruolo errato!", "Errore", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-            } else {
-                // Se login fallisce, procediamo direttamente con la registrazione
-                opt = controller.registraUtente(nome, email, pwd, ruolo);
-                if (opt.isPresent()) {
-                    utenteLoggato = opt.get();
-                    JOptionPane.showMessageDialog(this, "Registrazione avvenuta con successo!");
+            } 
+            // Se login fallisce, prova registrazione
+            else {
+                risultato = controller.registraUtente(nome, email, pwd, ruolo);
+                
+                if (risultato.isPresent()) {
+                    utenteLoggato = risultato.get();
+                    JOptionPane.showMessageDialog(Gui.this, "Registrazione completata!");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Errore nella registrazione! Verifica che l'email non sia già in uso.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(Gui.this, "Errore nella registrazione!", "Errore", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
 
-            // Passo alla finestra del ruolo
-            this.setVisible(false);
+            // Apri finestra ruolo
+            Gui.this.setVisible(false);
             apriFinestraRuolo();
         });
     }
@@ -156,86 +161,109 @@ public class Gui extends JFrame {
 
         btnListaGiudici.addActionListener(_ -> {
             controller.caricaGiudiciDaDB();
-            List<Giudice> list = controller.getHackathon().getGiudici();
-            String s = list.isEmpty() ? "Nessun giudice" :
-                    String.join("\n", list.stream().map(Giudice::getNome).toArray(String[]::new));
-            JOptionPane.showMessageDialog(this, s);
+            List<Giudice> listaGiudici = controller.getHackathon().getGiudici();
+            
+            if (listaGiudici.isEmpty()) {
+                JOptionPane.showMessageDialog(Gui.this, "Nessun giudice");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (Giudice g : listaGiudici) {
+                    sb.append(g.getNome()).append("\n");
+                }
+                JOptionPane.showMessageDialog(Gui.this, sb.toString());
+            }
         });
+        
         btnListaPartecipanti.addActionListener(_ -> {
             controller.caricaTeamsDaDB();
-            List<Partecipante> pp = controller.getHackathon().getPartecipanti();
-            String s = pp.isEmpty() ? "Nessun partecipante" :
-                    String.join("\n", pp.stream().map(Partecipante::getNome).toArray(String[]::new));
-            JOptionPane.showMessageDialog(this, s);
+            List<Partecipante> listaPartecipanti = controller.getHackathon().getPartecipanti();
+            
+            if (listaPartecipanti.isEmpty()) {
+                JOptionPane.showMessageDialog(Gui.this, "Nessun partecipante");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (Partecipante p : listaPartecipanti) {
+                    sb.append(p.getNome()).append("\n");
+                }
+                JOptionPane.showMessageDialog(Gui.this, sb.toString());
+            }
         });
         btnValutaTeam.addActionListener(_ -> {
-            // Prima carichiamo i team disponibili
+            // Carica i team
             controller.caricaTeamsDaDB();
             List<Team> teams = controller.getListaTeam();
+            
             if (teams.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Nessun team disponibile da valutare.");
+                JOptionPane.showMessageDialog(Gui.this, "Nessun team disponibile da valutare.");
                 return;
             }
 
-            // Creiamo un array di stringhe per il JComboBox
+            // Prepara array per combobox
             String[] teamOptions = new String[teams.size()];
             for (int i = 0; i < teams.size(); i++) {
                 Team t = teams.get(i);
                 teamOptions[i] = t.getNome() + " (ID: " + t.getId() + ")";
             }
 
-            // Mostriamo un JComboBox per selezionare il team
+            // Crea pannello
             JComboBox<String> teamCombo = new JComboBox<>(teamOptions);
             JPanel panel = new JPanel(new GridLayout(0, 1));
             panel.add(new JLabel("Seleziona il team da valutare:"));
             panel.add(teamCombo);
 
-            // Aggiungiamo uno spinner per il voto
+            // Spinner per voto
             SpinnerNumberModel votoModel = new SpinnerNumberModel(7, 1, 10, 1);
             JSpinner votoSpinner = new JSpinner(votoModel);
             panel.add(new JLabel("Voto (1-10):"));
             panel.add(votoSpinner);
 
-            int result = JOptionPane.showConfirmDialog(this, panel, "Valuta Team",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE);
+            // Mostra dialogo
+            int result = JOptionPane.showConfirmDialog(Gui.this, panel, "Valuta Team",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             if (result == JOptionPane.OK_OPTION) {
+                // Estrai ID team
+                String selectedTeam = (String) teamCombo.getSelectedItem();
+                if (selectedTeam == null) {
+                    return;
+                }
+                
+                int startIndex = selectedTeam.indexOf("ID: ") + 4;
+                int endIndex = selectedTeam.indexOf(")");
+                
+                int teamId;
                 try {
-                    // Estraiamo l'ID del team dalla stringa selezionata
-                    String selectedTeam = (String) teamCombo.getSelectedItem();
-                    assert selectedTeam != null;
-                    int startIndex = selectedTeam.indexOf("ID: ") + 4;
-                    int endIndex = selectedTeam.indexOf(")");
-                    int teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
+                    teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(Gui.this, "Errore nel formato ID team", "Errore", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                    // Verifichiamo che il team esista nella lista caricata
-                    boolean teamEsiste = false;
-                    for (Team t : teams) {
-                        if (t.getId() == teamId) {
-                            teamEsiste = true;
-                            break;
-                        }
+                // Verifica team
+                boolean teamEsiste = false;
+                for (Team t : teams) {
+                    if (t.getId() == teamId) {
+                        teamEsiste = true;
+                        break;
                     }
+                }
 
-                    if (!teamEsiste) {
-                        JOptionPane.showMessageDialog(this,
-                                "Il team selezionato (ID: " + teamId + ") non esiste più nel database. Ricarica la lista dei team.",
-                                "Errore",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+                if (!teamEsiste) {
+                    JOptionPane.showMessageDialog(Gui.this, "Team non trovato nel database", "Errore", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                    // Otteniamo il voto dallo spinner
-                    int voto = (Integer) votoSpinner.getValue();
+                // Ottieni voto
+                int voto = (Integer) votoSpinner.getValue();
 
-                    // Utilizziamo l'ID del giudice loggato
-                    int idGiudiceLoggato = controller.getUtenteLoggato().getId();
-                    boolean ok = controller.assegnaVoto(idGiudiceLoggato, teamId, voto);
-                    JOptionPane.showMessageDialog(this, ok ? "Voto assegnato con successo" : "Errore nell'assegnazione del voto");
-                } catch(Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Si è verificato un errore: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                // Assegna voto
+                int idGiudice = controller.getUtenteLoggato().getId();
+                boolean ok = controller.assegnaVoto(idGiudice, teamId, voto);
+                
+                if (ok) {
+                    JOptionPane.showMessageDialog(Gui.this, "Voto assegnato con successo");
+                } else {
+                    JOptionPane.showMessageDialog(Gui.this, "Errore nell'assegnazione del voto", "Errore", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -247,13 +275,25 @@ public class Gui extends JFrame {
     }
 
     private void apriFinestraRuolo() {
-        switch (utenteLoggato.getRuolo().toLowerCase()) {
-            case "organizzatore" -> new FinestraOrganizzatore(controller, utenteLoggato, this).setVisible(true);
-            case "giudice" -> new FinestraGiudice(controller, utenteLoggato, this).setVisible(true);
-            case "partecipante" -> new FinestraPartecipante(controller, utenteLoggato, this).setVisible(true);
+        String ruolo = utenteLoggato.getRuolo().toLowerCase();
+
+        switch (ruolo) {
+            case "organizzatore" -> {
+                FinestraOrganizzatore finestra = new FinestraOrganizzatore(controller, utenteLoggato, this);
+                finestra.setVisible(true);
+            }
+            case "giudice" -> {
+                FinestraGiudice finestra = new FinestraGiudice(controller, utenteLoggato, this);
+                finestra.setVisible(true);
+            }
+            case "partecipante" -> {
+                FinestraPartecipante finestra = new FinestraPartecipante(controller, utenteLoggato, this);
+                finestra.setVisible(true);
+            }
             default -> JOptionPane.showMessageDialog(this, "Ruolo non riconosciuto!");
         }
-        this.setVisible(false); // Nasconde la finestra di login
+        
+        this.setVisible(false);
     }
 
     public static void main() {
