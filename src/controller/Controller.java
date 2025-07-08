@@ -148,7 +148,6 @@ public class Controller {
         return risultato;
     }
 
-    // Metodi rimossi: invitaGiudice e invitaPartecipante
     
     public boolean aggiungiGiudice(String nome, String email) {
         // Verifica che esista un hackathon

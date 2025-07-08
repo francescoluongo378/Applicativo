@@ -15,10 +15,6 @@ public interface PartecipanteDAO {
     
     /**
      * Salva un nuovo Partecipante nel database.
-     * <p>
-     * Questo metodo è simile a {@link #salva(Partecipante)} ma non restituisce
-     * un valore booleano.
-     * </p>
      * 
      * @param p Partecipante da salvare
      */

@@ -8,9 +8,7 @@ package model;
  * sono dichiarati come {@code final} per garantire che non vengano
  * modificati dopo la creazione dell'utente.
  * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
+ *
  */
 public class Utente {
     /** Identificativo univoco dell'utente */

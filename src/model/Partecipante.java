@@ -7,9 +7,6 @@ package model;
  * Ogni team può avere al massimo 3 partecipanti, ma questo limite
  * è implementato nel Controller e nella GUI, non in questa classe.
  * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
  */
 public class Partecipante extends Utente {
     /** ID del team a cui appartiene il partecipante */

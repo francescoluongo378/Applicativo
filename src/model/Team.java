@@ -10,9 +10,7 @@ import java.util.List;
  * a un progetto. Il limite di 3 partecipanti è implementato tramite controlli
  * nel Controller e nella GUI, non nella classe Team stessa.
  * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
+ *
  */
 public class Team {
     /** Identificativo univoco del team */

@@ -4,22 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Rappresenta un evento Hackathon con tutte le sue caratteristiche.
- * <p>
- * Un Hackathon è un evento in cui i partecipanti si riuniscono in team
- * per sviluppare progetti in un periodo di tempo limitato. Questa classe
- * gestisce tutte le informazioni relative all'evento, inclusi i partecipanti,
- * i team, i giudici e la classifica.
- * </p>
- * <p>
- * Le liste di giudici, team e partecipanti sono dichiarate come {@code final}
- * per garantire che i riferimenti non vengano modificati dopo l'inizializzazione.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public class Hackathon {
     /** Identificativo univoco dell'Hackathon, necessario per il database */
     private int id;

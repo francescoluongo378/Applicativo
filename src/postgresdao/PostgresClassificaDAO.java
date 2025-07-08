@@ -10,17 +10,7 @@ import model.*;
 import dao.ClassificaDAO;
 import database.ConnessioneDatabase;
 
-/**
- * Implementazione PostgreSQL dell'interfaccia ClassificaDAO.
- * <p>
- * Questa classe fornisce l'accesso ai dati della Classifica nel database PostgreSQL.
- * Implementa il metodo definito nell'interfaccia ClassificaDAO utilizzando
- * query SQL specifiche per PostgreSQL.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public class PostgresClassificaDAO implements ClassificaDAO {
 
     /**

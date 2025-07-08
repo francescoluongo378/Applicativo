@@ -22,13 +22,7 @@ public class ConnessioneDatabase {
     /** Connessione al database */
     private Connection connection;
 
-    /**
-     * Costruttore privato per il pattern Singleton.
-     * <p>
-     * Inizializza la connessione al database. Il costruttore è privato
-     * per impedire la creazione di istanze multiple della classe.
-     * </p>
-     */
+
     private ConnessioneDatabase() {
         try {
             this.connection = DriverManager.getConnection(URL, USER, PASSWORD);

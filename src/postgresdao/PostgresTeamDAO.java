@@ -9,17 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implementazione PostgreSQL dell'interfaccia TeamDAO.
- * <p>
- * Questa classe fornisce l'accesso ai dati dei Team nel database PostgreSQL.
- * Implementa tutti i metodi definiti nell'interfaccia TeamDAO utilizzando
- * query SQL specifiche per PostgreSQL.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public class PostgresTeamDAO implements TeamDAO {
 
     /**

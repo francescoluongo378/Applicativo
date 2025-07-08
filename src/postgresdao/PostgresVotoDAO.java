@@ -6,17 +6,7 @@ import model.Voto;
 
 import java.sql.*;
 
-/**
- * Implementazione PostgreSQL dell'interfaccia VotoDAO.
- * <p>
- * Questa classe fornisce l'accesso ai dati dei Voti nel database PostgreSQL.
- * Implementa tutti i metodi definiti nell'interfaccia VotoDAO utilizzando
- * query SQL specifiche per PostgreSQL.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public class PostgresVotoDAO implements VotoDAO {
 
     /**

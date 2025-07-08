@@ -7,9 +7,7 @@ package model;
  * assegnando voti. I giudici sono assegnati a un Hackathon
  * specifico e possono votare tutti i team partecipanti.
  * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
+
  */
 public class Giudice extends Utente {
 

@@ -10,14 +10,6 @@ package model;
  *   <li>Punteggio assegnato (tipicamente da 1 a 10)</li>
  * </ul>
  * </p>
- * <p>
- * Gli attributi idTeam, idGiudice e punteggio sono dichiarati come {@code final}
- * per garantire l'immutabilità del voto una volta creato. Questo è importante
- * per mantenere l'integrità delle valutazioni.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
  */
 public class Voto {
     /** Identificativo univoco del voto nel database (opzionale) */

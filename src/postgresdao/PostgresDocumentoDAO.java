@@ -11,7 +11,7 @@ import java.util.List;
 public class PostgresDocumentoDAO implements DocumentoDAO {
 
     public PostgresDocumentoDAO() {
-        // No need to store a connection as a field - we'll use try-with-resources in each method
+
     }
 
     @Override
