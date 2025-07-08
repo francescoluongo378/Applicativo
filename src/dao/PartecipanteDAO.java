@@ -3,17 +3,7 @@ import model.*;
 
 import java.util.List;
 
-/**
- * Interfaccia per l'accesso ai dati dei Partecipanti.
- * <p>
- * Questa interfaccia definisce i metodi per l'accesso ai dati dei Partecipanti
- * nel database. Le implementazioni concrete di questa interfaccia
- * forniscono l'accesso a database specifici (es. PostgreSQL).
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public interface PartecipanteDAO {
     /**
      * Salva un nuovo Partecipante nel database.

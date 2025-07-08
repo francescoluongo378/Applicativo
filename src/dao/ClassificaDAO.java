@@ -2,22 +2,7 @@ package dao;
 
 import model.Classifica;
 
-/**
- * Interfaccia per l'accesso ai dati della Classifica.
- * <p>
- * Questa interfaccia definisce i metodi per l'accesso ai dati della Classifica
- * nel database. Le implementazioni concrete di questa interfaccia
- * forniscono l'accesso a database specifici (es. PostgreSQL).
- * </p>
- * <p>
- * A differenza delle altre interfacce DAO, questa non fornisce metodi CRUD
- * completi perché la Classifica è un oggetto derivato dai Team e dai Voti,
- * non un'entità persistente autonoma.
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public interface ClassificaDAO {
     /**
      * Ottiene la classifica per un Hackathon.

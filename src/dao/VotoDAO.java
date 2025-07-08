@@ -2,17 +2,6 @@ package dao;
 
 import model.Voto;
 
-/**
- * Interfaccia per l'accesso ai dati dei Voti.
- * <p>
- * Questa interfaccia definisce i metodi per l'accesso ai dati dei Voti
- * nel database. Le implementazioni concrete di questa interfaccia
- * forniscono l'accesso a database specifici (es. PostgreSQL).
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
 public interface VotoDAO {
     /**
      * Salva un nuovo Voto nel database.

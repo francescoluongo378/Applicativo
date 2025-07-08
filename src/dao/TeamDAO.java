@@ -3,17 +3,7 @@ import model.*;
 
 import java.util.List;
 
-/**
- * Interfaccia per l'accesso ai dati dei Team.
- * <p>
- * Questa interfaccia definisce i metodi per l'accesso ai dati dei Team
- * nel database. Le implementazioni concrete di questa interfaccia
- * forniscono l'accesso a database specifici (es. PostgreSQL).
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public interface TeamDAO {
     /**
      * Salva un nuovo Team nel database.

@@ -3,18 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Rappresenta la graduatoria dei team in base ai voti ricevuti.
- * <p>
- * La classifica contiene una lista di team ordinati per punteggio.
- * La lista è dichiarata come {@code final}, il che significa che il riferimento
- * alla lista non può essere modificato dopo l'inizializzazione nel costruttore.
- * Questo non impedisce di modificare il contenuto della lista (aggiungere/rimuovere team).
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public class Classifica {
     /**
      * Lista dei team ordinati per punteggio.

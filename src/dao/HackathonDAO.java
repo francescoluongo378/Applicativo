@@ -3,17 +3,7 @@ package dao;
 import model.Hackathon;
 import java.util.List;
 
-/**
- * Interfaccia per l'accesso ai dati degli Hackathon.
- * <p>
- * Questa interfaccia definisce i metodi per l'accesso ai dati degli Hackathon
- * nel database. Le implementazioni concrete di questa interfaccia
- * forniscono l'accesso a database specifici (es. PostgreSQL).
- * </p>
- * 
- * @author Sistema Gestione Hackathon
- * @version 1.0
- */
+
 public interface HackathonDAO {
     /**
      * Salva un nuovo Hackathon nel database.
