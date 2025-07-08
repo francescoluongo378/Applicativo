@@ -4,22 +4,69 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Rappresenta un evento Hackathon con tutte le sue caratteristiche.
+ * <p>
+ * Un Hackathon è un evento in cui i partecipanti si riuniscono in team
+ * per sviluppare progetti in un periodo di tempo limitato. Questa classe
+ * gestisce tutte le informazioni relative all'evento, inclusi i partecipanti,
+ * i team, i giudici e la classifica.
+ * </p>
+ * <p>
+ * Le liste di giudici, team e partecipanti sono dichiarate come {@code final}
+ * per garantire che i riferimenti non vengano modificati dopo l'inizializzazione.
+ * </p>
+ * 
+ * @author Sistema Gestione Hackathon
+ * @version 1.0
+ */
 public class Hackathon {
-    private int id; // NECESSARIO PER DATABASE
+    /** Identificativo univoco dell'Hackathon, necessario per il database */
+    private int id;
+    
+    /** Titolo dell'evento */
     private String titolo;
+    
+    /** Luogo dove si svolge l'evento */
     private String sede;
+    
+    /** Numero massimo di partecipanti ammessi */
     private int maxPartecipanti;
+    
+    /** Data e ora di inizio dell'Hackathon */
     private LocalDateTime dataInizio;
+    
+    /** Data e ora di fine dell'Hackathon */
     private LocalDateTime dataFine;
+    
+    /** Data e ora di apertura delle iscrizioni */
     private LocalDateTime inizioIscrizioni;
+    
+    /** Data e ora di chiusura delle iscrizioni */
     private LocalDateTime fineIscrizioni;
+    
+    /** Numero massimo di team ammessi */
     private int maxTeam;
+    
+    /** Classifica dei team partecipanti */
     private final Classifica classifica;
+    
+    /** Lista dei giudici assegnati all'Hackathon */
     private final List<Giudice> giudici;
+    
+    /** Lista dei team partecipanti */
     private final List<Team> teams;
+    
+    /** Lista dei partecipanti iscritti */
     private final List<Partecipante> partecipanti;
 
-    // Costruttore
+    /**
+     * Costruttore di default.
+     * <p>
+     * Inizializza le liste di giudici, team e partecipanti come ArrayList vuoti.
+     * Crea anche una nuova istanza di Classifica.
+     * </p>
+     */
     public Hackathon() {
         this.giudici = new ArrayList<>();
         this.teams = new ArrayList<>();
@@ -101,22 +148,54 @@ public class Hackathon {
         this.maxTeam = maxTeam;
     }
 
-     public List<Giudice> getGiudici() {
+     /**
+     * Restituisce una copia della lista dei giudici assegnati all'Hackathon.
+     * <p>
+     * Viene restituita una copia per evitare modifiche non controllate alla lista originale.
+     * </p>
+     * 
+     * @return Copia della lista dei giudici
+     */
+    public List<Giudice> getGiudici() {
         return new ArrayList<>(giudici);
     }
 
+    /**
+     * Restituisce una copia della lista dei team partecipanti all'Hackathon.
+     * <p>
+     * Viene restituita una copia per evitare modifiche non controllate alla lista originale.
+     * </p>
+     * 
+     * @return Copia della lista dei team
+     */
     public List<Team> getTeams() {
         return new ArrayList<>(teams);
     }
 
-
-
-
+    /**
+     * Aggiunge un team alla lista dei team partecipanti e alla classifica.
+     * <p>
+     * Questo metodo aggiorna sia la lista interna dei team sia la classifica
+     * associata all'Hackathon.
+     * </p>
+     * 
+     * @param team Team da aggiungere
+     */
     public void aggiungiTeam(Team team) {
         teams.add(team);
         classifica.aggiungiTeam(team);
     }
 
+    /**
+     * Restituisce la lista dei partecipanti iscritti all'Hackathon.
+     * <p>
+     * A differenza dei metodi getGiudici() e getTeams(), questo metodo
+     * restituisce la lista originale e non una copia. Questo è un design
+     * intenzionale per permettere modifiche dirette alla lista.
+     * </p>
+     * 
+     * @return Lista dei partecipanti
+     */
     public List<Partecipante> getPartecipanti() {
         System.out.println("DEBUG: getPartecipanti chiamato");
 

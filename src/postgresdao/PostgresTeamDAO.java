@@ -9,8 +9,29 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementazione PostgreSQL dell'interfaccia TeamDAO.
+ * <p>
+ * Questa classe fornisce l'accesso ai dati dei Team nel database PostgreSQL.
+ * Implementa tutti i metodi definiti nell'interfaccia TeamDAO utilizzando
+ * query SQL specifiche per PostgreSQL.
+ * </p>
+ * 
+ * @author Sistema Gestione Hackathon
+ * @version 1.0
+ */
 public class PostgresTeamDAO implements TeamDAO {
 
+    /**
+     * Salva un nuovo Team nel database PostgreSQL.
+     * <p>
+     * Questo metodo inserisce un nuovo record nella tabella team
+     * e restituisce il Team con l'ID assegnato dal database.
+     * </p>
+     * 
+     * @param team Team da salvare
+     * @return Team salvato con ID assegnato, null in caso di errore
+     */
     @Override
     public Team salva(Team team) {
         if (team == null) return null;

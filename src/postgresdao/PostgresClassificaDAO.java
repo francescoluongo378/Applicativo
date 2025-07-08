@@ -10,8 +10,35 @@ import model.*;
 import dao.ClassificaDAO;
 import database.ConnessioneDatabase;
 
+/**
+ * Implementazione PostgreSQL dell'interfaccia ClassificaDAO.
+ * <p>
+ * Questa classe fornisce l'accesso ai dati della Classifica nel database PostgreSQL.
+ * Implementa il metodo definito nell'interfaccia ClassificaDAO utilizzando
+ * query SQL specifiche per PostgreSQL.
+ * </p>
+ * 
+ * @author Sistema Gestione Hackathon
+ * @version 1.0
+ */
 public class PostgresClassificaDAO implements ClassificaDAO {
 
+    /**
+     * Ottiene la classifica per un Hackathon dal database PostgreSQL.
+     * <p>
+     * Questo metodo esegue una query SQL che:
+     * <ol>
+     *   <li>Recupera tutti i team dell'Hackathon specificato</li>
+     *   <li>Calcola la media dei voti per ogni team</li>
+     *   <li>Ordina i team per media decrescente</li>
+     *   <li>Carica i voti effettivi per ogni team</li>
+     *   <li>Crea un oggetto Classifica contenente i team ordinati</li>
+     * </ol>
+     * </p>
+     * 
+     * @param hackathonId ID dell'Hackathon
+     * @return Oggetto Classifica contenente i team ordinati per punteggio
+     */
     @Override
     public Classifica getClassifica(int hackathonId) {
         Classifica classifica = new Classifica();

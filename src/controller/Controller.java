@@ -45,7 +45,7 @@ public class Controller {
         // Prova a caricare l'hackathon esistente (assumiamo che ce ne sia solo uno per semplicità)
         List<Hackathon> hackathons = hackathonDAO.findAll();
         if (!hackathons.isEmpty()) {
-            return hackathons.getFirst(); // Prendi il primo hackathon trovato
+            return hackathons.getFirst();
         } else {
             // Se non esiste, crea un nuovo hackathon vuoto
             return new Hackathon();
@@ -105,12 +105,19 @@ public class Controller {
         hackathon.setMaxPartecipanti(maxPartecipanti);
         hackathon.setMaxTeam(maxTeam);
 
-        boolean salvato = hackathonDAO.salva(hackathon);
-        if (salvato) {
+        boolean risultato;
+        // Se l'hackathon ha già un ID, aggiorna invece di salvare
+        if (hackathon.getId() > 0) {
+            risultato = hackathonDAO.aggiorna(hackathon);
+        } else {
+            risultato = hackathonDAO.salva(hackathon);
+        }
+        
+        if (risultato) {
             Hackathon h = hackathonDAO.trovaPerId(hackathon.getId());
             if (h != null) hackathon = h;
         }
-        return salvato;
+        return risultato;
     }
     
     public boolean creaHackathon(String titolo, String sede, int maxPartecipanti, int maxTeam,
@@ -126,12 +133,19 @@ public class Controller {
         hackathon.setInizioIscrizioni(inizioIscrizioni);
         hackathon.setFineIscrizioni(fineIscrizioni);
 
-        boolean salvato = hackathonDAO.salva(hackathon);
-        if (salvato) {
+        boolean risultato;
+        // Se l'hackathon ha già un ID, aggiorna invece di salvare
+        if (hackathon.getId() > 0) {
+            risultato = hackathonDAO.aggiorna(hackathon);
+        } else {
+            risultato = hackathonDAO.salva(hackathon);
+        }
+        
+        if (risultato) {
             Hackathon h = hackathonDAO.trovaPerId(hackathon.getId());
             if (h != null) hackathon = h;
         }
-        return salvato;
+        return risultato;
     }
 
     // Metodi rimossi: invitaGiudice e invitaPartecipante
@@ -195,6 +209,28 @@ public class Controller {
     }
 
     // --- TEAM ---
+    /**
+     * Crea un nuovo team e associa un partecipante.
+     * <p>
+     * Questo metodo esegue diverse operazioni:
+     * <ol>
+     *   <li>Verifica che il nome del team sia valido</li>
+     *   <li>Crea un Hackathon di default se necessario</li>
+     *   <li>Verifica che il nome del team non sia già in uso</li>
+     *   <li>Crea e salva il nuovo team</li>
+     *   <li>Verifica che il team non abbia già raggiunto il limite di 3 partecipanti</li>
+     *   <li>Associa il partecipante al team</li>
+     * </ol>
+     * </p>
+     * <p>
+     * <strong>Nota importante:</strong> Un team può avere al massimo 3 partecipanti.
+     * Questo limite è implementato con controlli espliciti in questo metodo.
+     * </p>
+     * 
+     * @param nomeTeam Nome del nuovo team
+     * @param idPartecipante ID del partecipante da associare al team
+     * @return true se l'operazione è riuscita, false altrimenti
+     */
     public boolean creaTeam(String nomeTeam, int idPartecipante) {
         // Controllo nome team
         if (nomeTeam == null || nomeTeam.isBlank()) {
@@ -238,6 +274,7 @@ public class Controller {
             System.err.println("Errore conteggio partecipanti");
         }
         
+        // Implementazione del limite di 3 partecipanti per team
         if (numPartecipanti >= 3) {
             System.err.println("Team già pieno (max 3)");
             return false;

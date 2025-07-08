@@ -208,14 +208,18 @@ public class FinestraPartecipante extends JFrame {
             }
 
             // Filtriamo i team che hanno meno di 3 membri
+            // Implementazione del limite di 3 partecipanti per team nella GUI
             List<Team> teamsDisponibili = new ArrayList<>();
             for (Team team : teams) {
+                // Utilizziamo il metodo contaPartecipantiInTeam per verificare il numero attuale di membri
                 int numMembri = ((PostgresPartecipanteDAO)controller.getPartecipanteDAO()).contaPartecipantiInTeam(team.getId());
+                // Aggiungiamo alla lista solo i team che hanno meno di 3 membri
                 if (numMembri < 3) {
                     teamsDisponibili.add(team);
                 }
             }
 
+            // Se non ci sono team disponibili (tutti hanno già 3 membri), mostriamo un messaggio
             if (teamsDisponibili.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Tutti i team hanno già raggiunto il numero massimo di 3 membri.");
                 return;

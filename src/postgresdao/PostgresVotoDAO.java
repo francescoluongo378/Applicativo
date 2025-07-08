@@ -6,13 +6,47 @@ import model.Voto;
 
 import java.sql.*;
 
+/**
+ * Implementazione PostgreSQL dell'interfaccia VotoDAO.
+ * <p>
+ * Questa classe fornisce l'accesso ai dati dei Voti nel database PostgreSQL.
+ * Implementa tutti i metodi definiti nell'interfaccia VotoDAO utilizzando
+ * query SQL specifiche per PostgreSQL.
+ * </p>
+ * 
+ * @author Sistema Gestione Hackathon
+ * @version 1.0
+ */
 public class PostgresVotoDAO implements VotoDAO {
 
+    /**
+     * Salva un nuovo Voto nel database PostgreSQL.
+     * <p>
+     * Questo metodo delega al metodo {@link #salvaVoto(int, int, int)}
+     * passando i singoli attributi del voto.
+     * </p>
+     * 
+     * @param voto Voto da salvare
+     * @return true se il salvataggio è riuscito, false altrimenti
+     */
     @Override
     public boolean salvaVoto(Voto voto) {
         return salvaVoto(voto.getIdGiudice(), voto.getIdTeam(), voto.getPunteggio());
     }
 
+    /**
+     * Salva un nuovo Voto nel database PostgreSQL specificando i singoli attributi.
+     * <p>
+     * Questo metodo verifica prima se esiste già un voto dello stesso giudice
+     * per lo stesso team. Se esiste, aggiorna il voto esistente, altrimenti
+     * inserisce un nuovo voto.
+     * </p>
+     * 
+     * @param idGiudice ID del giudice che ha assegnato il voto
+     * @param idTeam ID del team valutato
+     * @param punteggio Punteggio assegnato (tipicamente da 1 a 10)
+     * @return true se il salvataggio è riuscito, false altrimenti
+     */
     @Override
     public boolean salvaVoto(int idGiudice, int idTeam, int punteggio) {
         // Prima verifichiamo se esiste già un voto di questo giudice per questo team

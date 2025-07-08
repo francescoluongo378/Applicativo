@@ -185,6 +185,18 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
         }
     }
     
+    /**
+     * Conta il numero di partecipanti in un team.
+     * <p>
+     * Questo metodo è utilizzato per verificare se un team ha raggiunto
+     * il limite massimo di 3 partecipanti. Il limite è implementato con
+     * controlli espliciti nel Controller e nella GUI che utilizzano
+     * questo metodo per ottenere il conteggio attuale.
+     * </p>
+     * 
+     * @param idTeam ID del team di cui contare i partecipanti
+     * @return Numero di partecipanti nel team, 0 in caso di errore
+     */
     public int contaPartecipantiInTeam(int idTeam) {
         try (Connection conn = ConnessioneDatabase.getInstance().getConnection()) {
 
