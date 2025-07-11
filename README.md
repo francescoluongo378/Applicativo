@@ -3,7 +3,7 @@
  * SISTEMA DI GESTIONE HACKATHON - DOCUMENTAZIONE TECNICA COMPLETA
  * ================================================================
  *
- * Autore: Francesco [Cognome] - Progetto Universitario BCE + DAO
+ * Autore: Francesco Luongo N86005766 Alfredo Fucci N86005560- Progetto Universitario BCE + DAO
  * Data: Luglio 2025
  * Linguaggio: Java
  * Database: PostgreSQL
