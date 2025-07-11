@@ -1,191 +1,193 @@
 /**
- * DOCUMENTAZIONE COMPLETA DEL SISTEMA DI GESTIONE HACKATHON
- * ==========================================================
+ * ================================================================
+ * SISTEMA DI GESTIONE HACKATHON - DOCUMENTAZIONE TECNICA COMPLETA
+ * ================================================================
  *
- * Questo documento descrive dettagliatamente il funzionamento del sistema Hackathon,
- * la sua architettura software, le componenti principali e le funzionalità fornite.
- * L’obiettivo è fornire una visione chiara per sviluppatori, utenti e manutentori.
+ * Autore: Francesco [Cognome] - Progetto Universitario BCE + DAO
+ * Data: Luglio 2025
+ * Linguaggio: Java
+ * Database: PostgreSQL
+ * Architettura: BCE (Boundary-Control-Entity) + DAO
  *
- * INDICE:
- * 1. Introduzione generale
- * 2. Architettura del Sistema
- * 3. Struttura del Modello Dati
+ * Questo documento descrive l'intero sistema software sviluppato per
+ * la gestione di un evento Hackathon. L'applicazione consente di
+ * creare un hackathon, registrare utenti, assegnare ruoli (organizzatore,
+ * giudice, partecipante), creare team, valutare e generare classifiche.
+ * 
+ * L'interfaccia utente è realizzata in Swing, il backend in Java e la
+ * persistenza dei dati avviene tramite DAO e PostgreSQL.
+ *
+ * STRUTTURA DEL DOCUMENTO:
+ * 1. Panoramica del Sistema
+ * 2. Architettura BCE + DAO
+ * 3. Modello dei Dati
  * 4. DAO e Accesso al Database
- * 5. Controller e Logica Applicativa
- * 6. Interfaccia Grafica Utente (GUI)
- * 7. Flusso delle Operazioni
- * 8. Sicurezza e Ruoli Utente
- * 9. Manutenzione ed Estensibilità
+ * 5. Controller e Logica di Business
+ * 6. Interfaccia Utente Swing
+ * 7. Flussi Operativi
+ * 8. Sicurezza e Autenticazione
+ * 9. Estendibilità e Manutenzione
  */
+
 public class DocumentazioneSistema {
 
     /**
-     * 1. INTRODUZIONE GENERALE
-     * ========================
-     *
-     * Il sistema "Hackathon Manager" è una piattaforma Java progettata per facilitare
-     * l'organizzazione e la gestione completa di eventi Hackathon.
-     * Include funzionalità per l’amministrazione, il monitoraggio, la valutazione dei team
-     * e la gestione dei documenti. Supporta tre ruoli principali: Organizzatore, Giudice e Partecipante.
-     *
-     * Funzionalità offerte:
-     * - Creazione e personalizzazione di eventi Hackathon
-     * - Gestione utenti con ruoli distinti
-     * - Formazione dei team e monitoraggio dei progressi
-     * - Valutazione tramite voti dei giudici
-     * - Calcolo automatico della classifica
-     * - Upload e gestione di documenti da parte dei team
-     *
-     * I dati sono salvati in un database PostgreSQL, e l’interfaccia utente è sviluppata in Java Swing.
+     * 1. PANORAMICA DEL SISTEMA
+     * =========================
+     * Il sistema permette la completa gestione di un evento Hackathon.
+     * Gli utenti si registrano, assumono un ruolo (Organizzatore, Giudice o Partecipante)
+     * e svolgono operazioni coerenti col proprio ruolo.
+     * 
+     * FUNZIONALITÀ:
+     * - Registrazione e login
+     * - Creazione hackathon
+     * - Invito giudici e partecipanti
+     * - Formazione e gestione team
+     * - Caricamento documenti da parte dei team
+     * - Valutazione dei team da parte dei giudici
+     * - Generazione automatica della classifica
+     * - Interfaccia semplice e adatta a ogni ruolo
      */
 
     /**
-     * 2. ARCHITETTURA DEL SISTEMA
-     * ===========================
-     *
-     * L’architettura segue il modello BCE (Boundary-Control-Entity) con DAO integrato:
-     *
-     * - ENTITY (Model): rappresenta le entità principali e incapsula la logica del dominio
-     * - CONTROL: contiene la logica applicativa e gestisce le richieste dall’interfaccia utente
-     * - BOUNDARY (GUI): funge da punto di contatto tra l’utente e il sistema
-     *
-     * Il pattern DAO (Data Access Object) è adottato per separare la logica di persistenza:
-     * - Interfacce nel package "dao"
-     * - Implementazioni concrete nel package "postgresdao"
-     * - La classe "ConnessioneDatabase" centralizza la gestione della connessione al DB
-     *
-     * Questa struttura migliora modularità, testabilità e futura estensione del sistema.
+     * 2. ARCHITETTURA BCE + DAO
+     * =========================
+     * Il sistema è strutturato secondo il pattern architetturale BCE (Boundary-Control-Entity)
+     * e DAO per l'accesso al database.
+     * 
+     * - BOUNDARY: classi GUI Swing, che permettono l’interazione con l’utente
+     * - CONTROL: Controller centrale che coordina tutte le operazioni tra GUI e Model
+     * - ENTITY: classi del package "model" che rappresentano i dati e la logica
+     * - DAO: interfacce (package dao) e implementazioni PostgreSQL (package postgresdao)
+     * 
+     * La connessione al database è centralizzata tramite la classe ConnessioneDatabase
+     * che implementa un Singleton.
      */
 
     /**
-     * 3. STRUTTURA DEL MODELLO DATI
-     * =============================
-     *
-     * Le classi principali che compongono il modello dati includono:
-     *
-     * - Utente: classe base per ogni ruolo (id, nome, email, password, ruolo)
-     * - Giudice: estende Utente, può valutare i team
-     * - Partecipante: estende Utente, può partecipare a team e caricare documenti
-     * - Organizzatore: specializzazione dell’utente che crea e gestisce l’Hackathon
-     * - Team: contiene più partecipanti, ha uno stato di avanzamento e riceve voti
-     * - Hackathon: evento principale (titolo, sede, limiti temporali, partecipanti e team)
-     * - Voto: relazione tra Giudice e Team con punteggio
-     * - Documento: rappresenta un file caricato da un Team
-     * - Classifica: calcola l’ordine dei team in base ai voti ricevuti
-     *
-     * Relazioni:
-     * - Un Hackathon include molti team, giudici e partecipanti
-     * - Ogni Team appartiene a un solo Hackathon e riceve più Voti
-     * - I Documenti sono associati ai Team
-     * - I Partecipanti appartengono a un Team
+     * 3. MODELLO DEI DATI
+     * ===================
+     * Le entità principali del sistema sono:
+     * 
+     * - Utente: classe base per ogni tipo di utente (Organizzatore, Giudice, Partecipante)
+     * - Partecipante: può creare team, caricare documenti e vedere la classifica
+     * - Giudice: può valutare i team con un punteggio
+     * - Organizzatore: può creare hackathon, invitare utenti e vedere tutti i dati
+     * - Team: gruppo di partecipanti che compete all’hackathon
+     * - Hackathon: evento contenitore di team, giudici, partecipanti
+     * - Voto: valutazione di un team da parte di un giudice
+     * - Documento: file allegato a un team (es. progetto finale)
+     * - Classifica: lista ordinata dei team in base alla media dei voti ricevuti
+     * 
+     * Le classi hanno ID, costruttori, metodi getter/setter e override di toString().
      */
 
     /**
-     * 4. DAO E ACCESSO AL DATABASE
-     * ============================
-     *
-     * Il sistema utilizza DAO per ogni entità, isolando la logica SQL dalla logica applicativa.
-     *
-     * Interfacce principali:
-     * - UtenteDAO, GiudiceDAO, PartecipanteDAO
-     * - TeamDAO, HackathonDAO, VotoDAO
-     * - DocumentoDAO, ClassificaDAO
-     *
-     * Ogni DAO fornisce metodi come:
+     * 4. COMPONENTI DAO
+     * =================
+     * Ogni entità ha una relativa interfaccia DAO e una classe che la implementa:
+     * 
+     * - dao/
+     *   - UtenteDAO
+     *   - HackathonDAO
+     *   - TeamDAO
+     *   - GiudiceDAO
+     *   - PartecipanteDAO
+     *   - VotoDAO
+     *   - DocumentoDAO
+     *   - ClassificaDAO
+     * 
+     * - postgresdao/
+     *   - PostgresUtenteDAO
+     *   - PostgresHackathonDAO
+     *   - ecc...
+     * 
+     * Tutti i DAO implementano metodi standard come:
      * - salva(entity)
      * - trovaPerId(id)
-     * - findAll()
      * - aggiorna(entity)
      * - elimina(id)
-     *
-     * Le implementazioni nel package "postgresdao" si interfacciano con PostgreSQL.
-     * Tutte le classi DAO si basano su "ConnessioneDatabase", che implementa un singleton
-     * per gestire una connessione unica e riutilizzabile.
+     * - findAll()
+     * 
+     * La connessione è gestita da ConnessioneDatabase.
      */
 
     /**
-     * 5. CONTROLLER E LOGICA APPLICATIVA
-     * ==================================
-     *
-     * Il Controller collega la GUI al Model e gestisce tutte le operazioni logiche e di coordinamento.
-     * Ha accesso a tutti i DAO e contiene i metodi per gestire gli scenari principali.
-     *
-     * Attributi chiave:
-     * - utenteLoggato: rappresenta l’utente attualmente attivo
-     * - hackathon: oggetto che rappresenta l’evento corrente
-     *
-     * Operazioni gestite:
-     * - login() e registrazione utente
-     * - creazione Hackathon e associazione con l’organizzatore
-     * - gestione giudici e partecipanti
-     * - creazione e modifica team
-     * - valutazione team da parte dei giudici
-     * - calcolo e aggiornamento classifica
-     * - caricamento di documenti e aggiornamento progresso team
-     *
-     * Il controller funge da centro nevralgico dell'applicazione.
+     * 5. CONTROLLER
+     * =============
+     * 
+     * Il Controller è una classe centrale che riceve le richieste dalle GUI
+     * e le traduce in operazioni sul Model e sul DB tramite DAO.
+     * 
+     * Attributi principali:
+     * - Hackathon corrente
+     * - Utente loggato
+     * - Tutti i DAO (iniettati nel costruttore)
+     * 
+     * Metodi principali:
+     * - login(email, password)
+     * - registraUtente()
+     * - creaHackathon()
+     * - aggiungiGiudice(), aggiungiPartecipante()
+     * - creaTeam()
+     * - valutaTeam(idTeam, punteggio)
+     * - getClassifica()
+     * 
+     * Esegue controlli logici prima di delegare ai DAO.
      */
 
     /**
-     * 6. INTERFACCIA GRAFICA UTENTE (GUI)
-     * ===================================
-     *
-     * L’interfaccia utente è costruita con Java Swing, ed è suddivisa per ruolo:
-     *
-     * - Gui: schermata di login/registrazione e gestione iniziale del flusso
-     * - FinestraOrganizzatore: consente la creazione dell’Hackathon e la gestione utenti
-     * - FinestraGiudice: mostra i team e consente l’inserimento dei voti
-     * - FinestraPartecipante: consente la gestione del team, il caricamento documenti e l’aggiornamento dei progressi
-     *
-     * La GUI invia le richieste al Controller, che esegue la logica e aggiorna i dati.
-     * Il sistema è progettato per essere intuitivo e reattivo.
-     */
-
-    /**
-     * 7. FLUSSO DELLE OPERAZIONI
-     * ==========================
-     *
-     * Il flusso generale del sistema è il seguente:
-     * 1. Un nuovo utente si registra tramite GUI → Controller → DAO → DB
-     * 2. Il primo utente è l’Organizzatore, che crea l’Hackathon
-     * 3. L’Organizzatore invita altri utenti (Giudici e Partecipanti)
-     * 4. I Partecipanti creano/si uniscono a Team, caricano Documenti e aggiornano il progresso
-     * 5. I Giudici valutano i Team tramite punteggi
-     * 6. Il sistema aggiorna la Classifica automaticamente
-     * 7. Tutti i dati sono persistiti nel database PostgreSQL
-     */
-
-    /**
-     * 8. SICUREZZA E RUOLI UTENTE
+     * 6. INTERFACCIA UTENTE (GUI)
      * ===========================
-     *
-     * Il sistema implementa un controllo base degli accessi:
-     * - Ogni utente ha un ruolo (Organizzatore, Giudice, Partecipante)
-     * - Le funzionalità nella GUI sono abilitate/disabilitate in base al ruolo
-     * - I dati sono visibili solo se l’utente ha i permessi adeguati
-     * - Il login è richiesto per ogni operazione
-     *
-     * In una futura estensione, è possibile integrare:
-     * - Crittografia delle password
-     * - Token di sessione o autenticazione OAuth
-     * - Log delle attività
+     * 
+     * La GUI è realizzata con Java Swing, suddivisa per ruolo utente:
+     * 
+     * - Gui.java → login e registrazione
+     * - FinestraOrganizzatore.java
+     * - FinestraGiudice.java
+     * - FinestraPartecipante.java
+     * 
+     * Ogni finestra ha pulsanti e campi testuali per le funzionalità del proprio ruolo.
+     * La GUI è collegata al Controller e aggiorna dinamicamente i dati mostrati.
+     * 
+     * Design semplice e comprensibile anche da utenti non esperti.
      */
 
     /**
-     * 9. MANUTENZIONE ED ESTENSIBILITÀ
-     * ================================
-     *
-     * Il sistema è pensato per essere facilmente mantenibile ed estendibile.
-     * La separazione in pacchetti logici (model, dao, controller, gui, postgresdao)
-     * consente una chiara individuazione delle responsabilità.
-     *
-     * Possibili estensioni:
-     * - Aggiunta di nuove metriche di valutazione
-     * - Integrazione con sistemi cloud per salvataggio file
-     * - Supporto a più hackathon contemporanei
-     * - Dashboard amministrativa e analisi statistiche
-     *
-     * Grazie all’uso dei pattern BCE e DAO, qualsiasi miglioramento può essere
-     * introdotto in modo progressivo, mantenendo l’affidabilità del sistema.
+     * 7. FLUSSI OPERATIVI
+     * ===================
+     * 
+     * - L’utente si registra → compare il login
+     * - Il primo utente è l’Organizzatore → crea l’Hackathon
+     * - Invita giudici e partecipanti
+     * - I partecipanti si uniscono in team e caricano documenti
+     * - I giudici assegnano voti
+     * - Il sistema calcola e visualizza la classifica
+     * 
+     * Tutti i dati vengono salvati su PostgreSQL tramite i DAO.
+     */
+
+    /**
+     * 8. SICUREZZA E AUTENTICAZIONE
+     * =============================
+     * 
+     * - Ogni utente effettua login con email e password
+     * - Le operazioni sono filtrate in base al ruolo (Organizzatore, Giudice, Partecipante)
+     * - I dati sono protetti nei DAO da eventuali errori o SQL injection (tramite PreparedStatement)
+     * - Il Controller controlla che un utente non possa accedere a funzioni di un altro ruolo
+     */
+
+    /**
+     * 9. ESTENDIBILITÀ E MANUTENZIONE
+     * ===============================
+     * 
+     * Il sistema è facilmente estendibile:
+     * - Aggiunta nuovi ruoli (es. Mentor) → basta estendere Utente
+     * - Cambio DB → basta creare nuovi DAO (es. MySQLDAO)
+     * - Migliorie GUI → modifiche isolate al package "gui"
+     * 
+     * La separazione tra View, Controller, Model e DAO rende semplice la manutenzione futura.
+     * È possibile testare facilmente ogni componente singolarmente.
      */
 }
+
