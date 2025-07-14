@@ -253,7 +253,7 @@ public class Controller {
         // Crea team
         Team nuovoTeam = new Team(0, nomeTeam, hackathon);
         nuovoTeam.setDescrizione("Team " + nomeTeam);
-        nuovoTeam.setProgresso(0);
+
 
         // Salva team
         Team teamSalvato = teamDAO.salva(nuovoTeam);

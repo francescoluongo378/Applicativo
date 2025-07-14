@@ -22,7 +22,7 @@ public class Team {
     /** Descrizione del progetto o del team */
     private String descrizione;
     
-    /** Percentuale di completamento del progetto (0-100) */
+    /** Percentuale di progresso del team */
     private int progresso;
     
     /** Riferimento all'Hackathon a cui il team partecipa */
@@ -33,10 +33,11 @@ public class Team {
 
     /**
      * Costruttore di default.
-     * Inizializza una lista vuota di voti.
+     * Inizializza una lista vuota di voti e progresso a 0.
      */
     public Team() {
         voti = new ArrayList<>();
+        progresso = 0;
     }
 
     /**
@@ -49,6 +50,25 @@ public class Team {
     public Team(int id, String nome, Hackathon hackathon) {
         this.id = id;
         this.nome = nome;
+        this.hackathon = hackathon;
+        this.voti = new ArrayList<>();
+        this.progresso = 0;
+    }
+    
+    /**
+     * Costruttore con parametri completi.
+     * 
+     * @param id Identificativo del team
+     * @param nome Nome del team
+     * @param descrizione Descrizione del team
+     * @param progresso Percentuale di progresso del team
+     * @param hackathon Hackathon a cui il team partecipa
+     */
+    public Team(int id, String nome, String descrizione, int progresso, Hackathon hackathon) {
+        this.id = id;
+        this.nome = nome;
+        this.descrizione = descrizione;
+        this.progresso = progresso;
         this.hackathon = hackathon;
         this.voti = new ArrayList<>();
     }
@@ -98,24 +118,19 @@ public class Team {
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
 
     /**
-     * Restituisce la percentuale di progresso del progetto.
+     * Restituisce la percentuale di progresso del team.
      * 
-     * @return Percentuale di progresso (0-100)
+     * @return Percentuale di progresso del team
      */
     public int getProgresso() { return progresso; }
     
     /**
-     * Imposta la percentuale di progresso del progetto.
+     * Imposta la percentuale di progresso del team.
      * 
-     * @param progresso Nuova percentuale di progresso (0-100)
+     * @param progresso Nuova percentuale di progresso del team
      */
     public void setProgresso(int progresso) { this.progresso = progresso; }
 
-    /**
-     * Restituisce l'Hackathon a cui il team partecipa.
-     * 
-     * @return Oggetto Hackathon
-     */
     public Hackathon getHackathon() { return hackathon; }
     
     /**
