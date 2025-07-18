@@ -37,25 +37,7 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
     }
 
     @Override
-    public Partecipante trovaPartecipantePerId(String id) {
-        String sql = "SELECT p.id, u.nome, u.email FROM partecipante p JOIN utente u ON p.id = u.id WHERE p.id = ?";
-        try (Connection conn = ConnessioneDatabase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, Integer.parseInt(id));
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Partecipante(
-                            rs.getInt("id"),
-                            rs.getString("nome"),
-                            rs.getString("email")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public Partecipante findById(int id) {
         return null;
     }
 
@@ -82,11 +64,7 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
         return lista;
     }
 
-    @Override
-    public Partecipante findById(int id) {
 
-        return trovaPartecipantePerId(String.valueOf(id));
-    }
 
     @Override
     public boolean aggiorna(Partecipante p) {
@@ -116,75 +94,12 @@ public class PostgresPartecipanteDAO implements PartecipanteDAO {
         return false;
     }
 
-
     @Override
     public void salvaPartecipanteNelTeam(int idPartecipante, int idTeam) {
-        try {
 
-            Partecipante p = findById(idPartecipante);
-            if (p == null) {
-
-                try (Connection conn = ConnessioneDatabase.getInstance().getConnection()) {
-                    String sql = "SELECT id, nome, email, password, ruolo FROM utente WHERE id = ?";
-                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                        stmt.setInt(1, idPartecipante);
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            if (rs.next()) {
-
-                                String nome = rs.getString("nome");
-                                String email = rs.getString("email");
-                                new Partecipante(idPartecipante, nome, email);
-
-
-                                String insertSql = "INSERT INTO partecipante (id, team_id) VALUES (?, ?)";
-                                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
-                                    insertStmt.setInt(1, idPartecipante);
-                                    insertStmt.setInt(2, idTeam);
-                                    insertStmt.executeUpdate();
-                                    System.out.println("Created new participant record for ID: " + idPartecipante + " in team: " + idTeam);
-                                    return;
-                                }
-                            } else {
-                                System.err.println("User not found with ID: " + idPartecipante);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            try (Connection conn = ConnessioneDatabase.getInstance().getConnection()) {
-                String checkSql = "SELECT team_id FROM partecipante WHERE id = ?";
-                try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-                    checkStmt.setInt(1, idPartecipante);
-                    try (ResultSet rs = checkStmt.executeQuery()) {
-                        if (rs.next()) {
-                            Integer currentTeamId = rs.getObject("team_id", Integer.class);
-                            if (currentTeamId != null) {
-
-                                String updateSql = "UPDATE partecipante SET team_id = ? WHERE id = ?";
-                                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-                                    updateStmt.setInt(1, idTeam);
-                                    updateStmt.setInt(2, idPartecipante);
-                                    updateStmt.executeUpdate();
-                                    System.out.println("Updated participant ID: " + idPartecipante + " to team: " + idTeam);
-                                    p.setTeamId(idTeam);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            p.setTeamId(idTeam);
-            aggiorna(p);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Errore nel salvare il partecipante nel team: " + e.getMessage());
-        }
     }
-    
+
+
     /**
      * Conta il numero di partecipanti in un team.
      * <p>

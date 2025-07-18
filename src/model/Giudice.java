@@ -16,7 +16,7 @@ public class Giudice extends Utente {
      * <p>
      * Crea un nuovo giudice con il ruolo "giudice".
      * </p>
-     * 
+     *
      * @param id ID del giudice
      * @param nome Nome del giudice
      * @param email Email del giudice
@@ -32,7 +32,7 @@ public class Giudice extends Utente {
      * Questo costruttore è utilizzato quando si carica un giudice
      * dal database ma non è necessaria la password.
      * </p>
-     * 
+     *
      * @param id ID del giudice
      * @param nome Nome del giudice
      * @param email Email del giudice

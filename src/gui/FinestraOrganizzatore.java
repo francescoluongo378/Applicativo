@@ -44,64 +44,64 @@ public class FinestraOrganizzatore extends JFrame {
         b1.addActionListener(_ -> {
             String titolo = JOptionPane.showInputDialog(this, "Titolo dell'Hackathon:");
             if (titolo == null) return; // L'utente ha annullato
-            
+
             String sede = JOptionPane.showInputDialog(this, "Sede dell'Hackathon:");
             if (sede == null) return; // L'utente ha annullato
-            
+
             String maxPartecipantiStr = JOptionPane.showInputDialog(this, "Numero massimo di partecipanti:");
             if (maxPartecipantiStr == null) return; // L'utente ha annullato
-            
+
             String maxTeamStr = JOptionPane.showInputDialog(this, "Numero massimo di team:");
             if (maxTeamStr == null) return; // L'utente ha annullato
 
             try {
                 int maxPartecipanti = Integer.parseInt(maxPartecipantiStr);
                 int maxTeam = Integer.parseInt(maxTeamStr);
-                
+
                 // Chiedi all'utente se vuole inserire anche le date
-                int scelta = JOptionPane.showConfirmDialog(this, 
-                    "Vuoi inserire anche le date per l'Hackathon?", 
-                    "Date Hackathon", 
-                    JOptionPane.YES_NO_OPTION);
-                
+                int scelta = JOptionPane.showConfirmDialog(this,
+                        "Vuoi inserire anche le date per l'Hackathon?",
+                        "Date Hackathon",
+                        JOptionPane.YES_NO_OPTION);
+
                 boolean ok;
-                
+
                 if (scelta == JOptionPane.YES_OPTION) {
                     // Chiedi le date
-                    String dataInizioStr = JOptionPane.showInputDialog(this, 
-                        "Data di inizio (formato: YYYY-MM-DD HH:MM):", 
-                        LocalDateTime.now().plusMonths(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                    String dataInizioStr = JOptionPane.showInputDialog(this,
+                            "Data di inizio (formato: YYYY-MM-DD HH:MM):",
+                            LocalDateTime.now().plusMonths(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                     if (dataInizioStr == null) return;
-                    
-                    String dataFineStr = JOptionPane.showInputDialog(this, 
-                        "Data di fine (formato: YYYY-MM-DD HH:MM):", 
-                        LocalDateTime.now().plusMonths(1).plusWeeks(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+                    String dataFineStr = JOptionPane.showInputDialog(this,
+                            "Data di fine (formato: YYYY-MM-DD HH:MM):",
+                            LocalDateTime.now().plusMonths(1).plusWeeks(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                     if (dataFineStr == null) return;
-                    
-                    String inizioIscrizioniStr = JOptionPane.showInputDialog(this, 
-                        "Data inizio iscrizioni (formato: YYYY-MM-DD HH:MM):", 
-                        LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+                    String inizioIscrizioniStr = JOptionPane.showInputDialog(this,
+                            "Data inizio iscrizioni (formato: YYYY-MM-DD HH:MM):",
+                            LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                     if (inizioIscrizioniStr == null) return;
-                    
-                    String fineIscrizioniStr = JOptionPane.showInputDialog(this, 
-                        "Data fine iscrizioni (formato: YYYY-MM-DD HH:MM):", 
-                        LocalDateTime.now().plusWeeks(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+                    String fineIscrizioniStr = JOptionPane.showInputDialog(this,
+                            "Data fine iscrizioni (formato: YYYY-MM-DD HH:MM):",
+                            LocalDateTime.now().plusWeeks(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                     if (fineIscrizioniStr == null) return;
-                    
+
                     try {
                         // Parsing delle date
-                        LocalDateTime dataInizio = LocalDateTime.parse(dataInizioStr, 
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                        LocalDateTime dataFine = LocalDateTime.parse(dataFineStr, 
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                        LocalDateTime inizioIscrizioni = LocalDateTime.parse(inizioIscrizioniStr, 
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                        LocalDateTime fineIscrizioni = LocalDateTime.parse(fineIscrizioniStr, 
-                            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                        
+                        LocalDateTime dataInizio = LocalDateTime.parse(dataInizioStr,
+                                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                        LocalDateTime dataFine = LocalDateTime.parse(dataFineStr,
+                                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                        LocalDateTime inizioIscrizioni = LocalDateTime.parse(inizioIscrizioniStr,
+                                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                        LocalDateTime fineIscrizioni = LocalDateTime.parse(fineIscrizioniStr,
+                                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+
                         // Crea l'hackathon con le date
-                        ok = ctrl.creaHackathon(titolo, sede, maxPartecipanti, maxTeam, 
-                                              dataInizio, dataFine, inizioIscrizioni, fineIscrizioni);
+                        ok = ctrl.creaHackathon(titolo, sede, maxPartecipanti, maxTeam,
+                                dataInizio, dataFine, inizioIscrizioni, fineIscrizioni);
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(this, "Formato data non valido. Usa il formato YYYY-MM-DD HH:MM");
                         return;
@@ -110,7 +110,7 @@ public class FinestraOrganizzatore extends JFrame {
                     // Crea l'hackathon senza date specificate
                     ok = ctrl.creaHackathon(titolo, sede, maxPartecipanti, maxTeam);
                 }
-                
+
                 JOptionPane.showMessageDialog(this, ok ? "Hackathon creato con successo!" : "Errore nella creazione dell'Hackathon.");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Inserisci valori numerici validi per i limiti.");

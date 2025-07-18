@@ -8,40 +8,40 @@ import java.util.List;
 public class Hackathon {
     /** Identificativo univoco dell'Hackathon, necessario per il database */
     private int id;
-    
+
     /** Titolo dell'evento */
     private String titolo;
-    
+
     /** Luogo dove si svolge l'evento */
     private String sede;
-    
+
     /** Numero massimo di partecipanti ammessi */
     private int maxPartecipanti;
-    
+
     /** Data e ora di inizio dell'Hackathon */
     private LocalDateTime dataInizio;
-    
+
     /** Data e ora di fine dell'Hackathon */
     private LocalDateTime dataFine;
-    
+
     /** Data e ora di apertura delle iscrizioni */
     private LocalDateTime inizioIscrizioni;
-    
+
     /** Data e ora di chiusura delle iscrizioni */
     private LocalDateTime fineIscrizioni;
-    
+
     /** Numero massimo di team ammessi */
     private int maxTeam;
-    
+
     /** Classifica dei team partecipanti */
     private final Classifica classifica;
-    
+
     /** Lista dei giudici assegnati all'Hackathon */
     private final List<Giudice> giudici;
-    
+
     /** Lista dei team partecipanti */
     private final List<Team> teams;
-    
+
     /** Lista dei partecipanti iscritti */
     private final List<Partecipante> partecipanti;
 
@@ -133,12 +133,12 @@ public class Hackathon {
         this.maxTeam = maxTeam;
     }
 
-     /**
+    /**
      * Restituisce una copia della lista dei giudici assegnati all'Hackathon.
      * <p>
      * Viene restituita una copia per evitare modifiche non controllate alla lista originale.
      * </p>
-     * 
+     *
      * @return Copia della lista dei giudici
      */
     public List<Giudice> getGiudici() {
@@ -150,7 +150,7 @@ public class Hackathon {
      * <p>
      * Viene restituita una copia per evitare modifiche non controllate alla lista originale.
      * </p>
-     * 
+     *
      * @return Copia della lista dei team
      */
     public List<Team> getTeams() {
@@ -163,7 +163,7 @@ public class Hackathon {
      * Questo metodo aggiorna sia la lista interna dei team sia la classifica
      * associata all'Hackathon.
      * </p>
-     * 
+     *
      * @param team Team da aggiungere
      */
     public void aggiungiTeam(Team team) {
@@ -178,7 +178,7 @@ public class Hackathon {
      * restituisce la lista originale e non una copia. Questo è un design
      * intenzionale per permettere modifiche dirette alla lista.
      * </p>
-     * 
+     *
      * @return Lista dei partecipanti
      */
     public List<Partecipante> getPartecipanti() {

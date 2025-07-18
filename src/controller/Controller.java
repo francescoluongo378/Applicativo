@@ -36,11 +36,11 @@ public class Controller {
         this.classificaDAO = new PostgresClassificaDAO();
         this.votoDAO = new PostgresVotoDAO();
         this.documentoDAO = new PostgresDocumentoDAO();
-        
+
         // Carica l'hackathon esistente o ne crea uno nuovo
         this.hackathon = caricaHackathonEsistente();
     }
-    
+
     private Hackathon caricaHackathonEsistente() {
         // Prova a caricare l'hackathon esistente (assumiamo che ce ne sia solo uno per semplicità)
         List<Hackathon> hackathons = hackathonDAO.findAll();
@@ -59,10 +59,10 @@ public class Controller {
         if (esistente != null) {
             return Optional.empty();
         }
-        
+
         // Crea nuovo utente
         Utente u = new Utente(nome, email, password, ruolo);
-        
+
         // Salva utente
         boolean salvato = utenteDAO.salva(u);
         if (salvato) {
@@ -76,19 +76,19 @@ public class Controller {
     public Optional<Utente> login(String email, String password) {
         // Cerca utente per email
         Utente u = utenteDAO.trovaPerEmail(email);
-        
+
         // Verifica che esista e che la password sia corretta
         if (u == null) {
             return Optional.empty();
         }
-        
+
         if (!u.getPassword().equals(password)) {
             return Optional.empty();
         }
-        
+
         // Imposta utente loggato
         this.utenteLoggato = u;
-        
+
         // Ritorna utente
         return Optional.of(u);
     }
@@ -112,17 +112,17 @@ public class Controller {
         } else {
             risultato = hackathonDAO.salva(hackathon);
         }
-        
+
         if (risultato) {
             Hackathon h = hackathonDAO.trovaPerId(hackathon.getId());
             if (h != null) hackathon = h;
         }
         return risultato;
     }
-    
+
     public boolean creaHackathon(String titolo, String sede, int maxPartecipanti, int maxTeam,
-                               LocalDateTime dataInizio, LocalDateTime dataFine, 
-                               LocalDateTime inizioIscrizioni, LocalDateTime fineIscrizioni) {
+                                 LocalDateTime dataInizio, LocalDateTime dataFine,
+                                 LocalDateTime inizioIscrizioni, LocalDateTime fineIscrizioni) {
         if (titolo == null || titolo.isBlank() || sede == null || sede.isBlank()) return false;
         hackathon.setTitolo(titolo);
         hackathon.setSede(sede);
@@ -140,7 +140,7 @@ public class Controller {
         } else {
             risultato = hackathonDAO.salva(hackathon);
         }
-        
+
         if (risultato) {
             Hackathon h = hackathonDAO.trovaPerId(hackathon.getId());
             if (h != null) hackathon = h;
@@ -148,7 +148,7 @@ public class Controller {
         return risultato;
     }
 
-    
+
     public boolean aggiungiGiudice(String nome, String email) {
         // Verifica che esista un hackathon
         if (hackathon.getId() <= 0) {
@@ -158,22 +158,22 @@ public class Controller {
                 return false;
             }
         }
-        
+
         // Registriamo direttamente il giudice senza invito
         Optional<Utente> opt = registraUtente(nome, email, "changeme", "giudice");
         if (opt.isEmpty()) return false;
         Utente u = opt.get();
         Giudice g = new Giudice(u.getId(), u.getNome(), u.getEmail(), u.getPassword());
-        
+
         // Salva il giudice nel database
         if (!giudiceDAO.salva(g)) return false;
-        
+
         // Aggiorna l'oggetto hackathon in memoria
         hackathon.getGiudici().add(g);
-        
+
         // Ricarica i giudici dal database per assicurarsi che siano aggiornati
         caricaGiudiciDaDB();
-        
+
         return true;
     }
 
@@ -186,24 +186,24 @@ public class Controller {
                 return false;
             }
         }
-        
+
         // Registriamo direttamente il partecipante senza invito
         Optional<Utente> opt = registraUtente(nome, email, "changeme", "partecipante");
         if (opt.isEmpty()) return false;
         Utente u = opt.get();
         Partecipante p = new Partecipante(u.getId(), u.getNome(), u.getEmail(), u.getPassword());
-        
+
         // Salva il partecipante nel database
         if (!partecipanteDAO.salva(p)) return false;
-        
+
         // Aggiorna l'oggetto hackathon in memoria
         hackathon.getPartecipanti().add(p);
-        
+
         // Aggiorna la lista dei partecipanti in memoria
         List<Partecipante> partecipantiAggiornati = partecipanteDAO.findAll();
         hackathon.getPartecipanti().clear();
         hackathon.getPartecipanti().addAll(partecipantiAggiornati);
-        
+
         return true;
     }
 
@@ -225,7 +225,7 @@ public class Controller {
      * <strong>Nota importante:</strong> Un team può avere al massimo 3 partecipanti.
      * Questo limite è implementato con controlli espliciti in questo metodo.
      * </p>
-     * 
+     *
      * @param nomeTeam Nome del nuovo team
      * @param idPartecipante ID del partecipante da associare al team
      * @return true se l'operazione è riuscita, false altrimenti
@@ -235,7 +235,7 @@ public class Controller {
         if (nomeTeam == null || nomeTeam.isBlank()) {
             return false;
         }
-        
+
         // Crea hackathon se non esiste
         if (hackathon.getId() <= 0) {
             if (!creaHackathonDefault()) {
@@ -272,13 +272,13 @@ public class Controller {
         } catch (Exception e) {
             System.err.println("Errore conteggio partecipanti");
         }
-        
+
         // Implementazione del limite di 3 partecipanti per team
         if (numPartecipanti >= 3) {
             System.err.println("Team già pieno (max 3)");
             return false;
         }
-        
+
         // Associa partecipante
         Partecipante p = partecipanteDAO.findById(idPartecipante);
         if (p != null) {
@@ -299,25 +299,25 @@ public class Controller {
 
         return true;
     }
-    
+
     private boolean creaHackathonDefault() {
         // Crea un hackathon con valori di default
         hackathon.setTitolo("Hackathon Default");
         hackathon.setSede("Sede Default");
         hackathon.setMaxPartecipanti(50);
         hackathon.setMaxTeam(10);
-        
+
         // Imposta date di default (oggi e tra un mese)
         LocalDateTime oggi = LocalDateTime.now();
         LocalDateTime traUnMese = oggi.plusMonths(1);
         LocalDateTime traUnaSett = oggi.plusWeeks(1);
         LocalDateTime traUnMeseEUnaSett = traUnMese.plusWeeks(1);
-        
+
         hackathon.setDataInizio(traUnMese);
         hackathon.setDataFine(traUnMeseEUnaSett);
         hackathon.setInizioIscrizioni(oggi);
         hackathon.setFineIscrizioni(traUnaSett);
-        
+
         boolean salvato = hackathonDAO.salva(hackathon);
         if (salvato) {
             Hackathon h = hackathonDAO.trovaPerId(hackathon.getId());
@@ -356,14 +356,14 @@ public class Controller {
             System.err.println("Il punteggio deve essere compreso tra 1 e 10");
             return false;
         }
-        
+
         // Verifica che il team esista
         Team team = teamDAO.trovaPerId(idTeam);
         if (team == null) {
             System.err.println("Team non trovato con ID: " + idTeam);
             return false;
         }
-        
+
         // Verifica che l'utente sia un giudice
         Giudice giudice = giudiceDAO.trovaGiudicePerId(idGiudice);
         if (giudice == null) {
@@ -374,20 +374,20 @@ public class Controller {
                 return false;
             }
         }
-        
+
         // Crea e salva il voto
         Voto voto = new Voto(idTeam, idGiudice, punteggio);
-        
+
         System.out.println("Salvataggio voto: Giudice=" + idGiudice + ", Team=" + idTeam + ", Voto=" + punteggio);
-        
+
         if (!votoDAO.salvaVoto(voto)) {
             System.err.println("Errore nel salvataggio del voto");
             return false;
         }
-        
+
         // Aggiorna i team
         caricaTeamsDaDB();
-        
+
         System.out.println("Voto assegnato con successo");
         return true;
     }
@@ -400,10 +400,10 @@ public class Controller {
             System.err.println("Partecipante non trovato");
             return false;
         }
-        
+
         // Trova team del partecipante
         int idTeam = p.getTeamId();
-        
+
         // Se non ha team, cerca nel database
         if (idTeam <= 0) {
             idTeam = getTeamIdByPartecipante(idPartecipante);
@@ -439,19 +439,19 @@ public class Controller {
         if (p != null && p.getTeamId() > 0) {
             return p.getTeamId();
         }
-        
+
         // Se non lo trova, cerca direttamente nel database
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        
+
         try {
             conn = ConnessioneDatabase.getInstance().getConnection();
             String sql = "SELECT team_id FROM partecipante WHERE id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, idPartecipante);
             rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 int teamId = rs.getInt("team_id");
                 if (!rs.wasNull()) {
@@ -469,12 +469,11 @@ public class Controller {
                 System.err.println("Errore chiusura connessione: " + e.getMessage());
             }
         }
-        
+
         return -1; // Nessuna associazione a team trovata
     }
-    
+
     public PartecipanteDAO getPartecipanteDAO() {
         return partecipanteDAO;
     }
 }
-

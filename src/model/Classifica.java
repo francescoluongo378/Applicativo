@@ -72,7 +72,7 @@ public class Classifica {
                     .append(". ")
                     .append(t.getNome())
                     .append(" – ")
-                    .append(t.getPuntiTotali())
+                    .append(t.getPunteggioMedio())
                     .append("\n");
         }
         return sb.toString();

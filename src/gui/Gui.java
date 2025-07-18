@@ -102,21 +102,21 @@ public class Gui extends JFrame {
 
             // Prova login
             Optional<Utente> risultato = controller.login(email, pwd);
-            
+
             // Se login ok
             if (risultato.isPresent()) {
                 utenteLoggato = risultato.get();
-                
+
                 // Verifica ruolo
                 if (!utenteLoggato.getRuolo().equalsIgnoreCase(ruolo)) {
                     JOptionPane.showMessageDialog(Gui.this, "Ruolo errato!", "Errore", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-            } 
+            }
             // Se login fallisce, prova registrazione
             else {
                 risultato = controller.registraUtente(nome, email, pwd, ruolo);
-                
+
                 if (risultato.isPresent()) {
                     utenteLoggato = risultato.get();
                     JOptionPane.showMessageDialog(Gui.this, "Registrazione completata!");
@@ -162,7 +162,7 @@ public class Gui extends JFrame {
         btnListaGiudici.addActionListener(_ -> {
             controller.caricaGiudiciDaDB();
             List<Giudice> listaGiudici = controller.getHackathon().getGiudici();
-            
+
             if (listaGiudici.isEmpty()) {
                 JOptionPane.showMessageDialog(Gui.this, "Nessun giudice");
             } else {
@@ -173,11 +173,11 @@ public class Gui extends JFrame {
                 JOptionPane.showMessageDialog(Gui.this, sb.toString());
             }
         });
-        
+
         btnListaPartecipanti.addActionListener(_ -> {
             controller.caricaTeamsDaDB();
             List<Partecipante> listaPartecipanti = controller.getHackathon().getPartecipanti();
-            
+
             if (listaPartecipanti.isEmpty()) {
                 JOptionPane.showMessageDialog(Gui.this, "Nessun partecipante");
             } else {
@@ -192,7 +192,7 @@ public class Gui extends JFrame {
             // Carica i team
             controller.caricaTeamsDaDB();
             List<Team> teams = controller.getListaTeam();
-            
+
             if (teams.isEmpty()) {
                 JOptionPane.showMessageDialog(Gui.this, "Nessun team disponibile da valutare.");
                 return;
@@ -227,10 +227,10 @@ public class Gui extends JFrame {
                 if (selectedTeam == null) {
                     return;
                 }
-                
+
                 int startIndex = selectedTeam.indexOf("ID: ") + 4;
                 int endIndex = selectedTeam.indexOf(")");
-                
+
                 int teamId;
                 try {
                     teamId = Integer.parseInt(selectedTeam.substring(startIndex, endIndex));
@@ -259,7 +259,7 @@ public class Gui extends JFrame {
                 // Assegna voto
                 int idGiudice = controller.getUtenteLoggato().getId();
                 boolean ok = controller.assegnaVoto(idGiudice, teamId, voto);
-                
+
                 if (ok) {
                     JOptionPane.showMessageDialog(Gui.this, "Voto assegnato con successo");
                 } else {
@@ -292,7 +292,7 @@ public class Gui extends JFrame {
             }
             default -> JOptionPane.showMessageDialog(this, "Ruolo non riconosciuto!");
         }
-        
+
         this.setVisible(false);
     }
 
